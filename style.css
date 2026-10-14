@@ -1199,10 +1199,10 @@ body {
 }
 
 @media (max-width: 768px) {
-    .sidebar { transform: translateX(-100%); }
+    .sidebar, .consulta-page .sidebar { transform: translateX(-100%); width: var(--sidebar-w); }
     .sidebar.open { transform: translateX(0); box-shadow: 8px 0 30px rgba(0, 0, 0, 0.6); }
     .sidebar-overlay.show { display: block; opacity: 1; }
-    .main-content { margin-left: 0; }
+    .main-content, .consulta-page .main-content { margin-left: 0; }
     .menu-btn { display: flex; }
     .topbar-search { display: none; }
     .user-name { display: none; }
