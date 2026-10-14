@@ -43,9 +43,16 @@ const sidebar = document.getElementById("sidebar");
 const sidebarToggle = document.getElementById("sidebarToggle");
 const menuBtn = document.getElementById("menuBtn");
 
+const sidebarOverlay = document.createElement("div");
+sidebarOverlay.className = "sidebar-overlay";
+document.body.appendChild(sidebarOverlay);
+
 function toggleSidebar() {
     if (sidebar) sidebar.classList.toggle("open");
+    sidebarOverlay.classList.toggle("show");
 }
+
+sidebarOverlay.addEventListener("click", toggleSidebar);
 
 if (sidebarToggle) sidebarToggle.addEventListener("click", toggleSidebar);
 if (menuBtn) menuBtn.addEventListener("click", toggleSidebar);
