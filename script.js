@@ -5,16 +5,35 @@ const loaderScreen = document.getElementById("loaderScreen");
 if (loaderScreen) {
     async function despertarBackend() {
         let listo = false;
-        while (!listo) {
+        let intentos = 0;
+        const maxIntentos = 15; // ~22 segundos
+
+        while (!listo && intentos < maxIntentos) {
             try {
                 const res = await fetch(BACKEND_URL + "/estado");
                 const data = await res.json();
                 listo = data.listo === true;
             } catch (err) { listo = false; }
+            intentos++;
             if (!listo) await new Promise(r => setTimeout(r, 1500));
         }
-        loaderScreen.classList.add("despegando");
-        setTimeout(() => { loaderScreen.style.display = "none"; }, 600);
+
+        if (listo) {
+            loaderScreen.classList.add("despegando");
+            setTimeout(() => { loaderScreen.style.display = "none"; }, 600);
+        } else {
+            const sub = loaderScreen.querySelector(".loader-sub");
+            if (sub) sub.textContent = "El servidor esta tardando mas de lo normal.";
+            const btn = document.createElement("button");
+            btn.textContent = "Reintentar";
+            btn.style.cssText = "margin-top:16px;padding:10px 20px;background:var(--rojo);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;";
+            btn.onclick = () => {
+                btn.remove();
+                if (sub) sub.textContent = "Inicializando plataforma segura...";
+                despertarBackend();
+            };
+            loaderScreen.querySelector(".loader-content").appendChild(btn);
+        }
     }
     despertarBackend();
 }
