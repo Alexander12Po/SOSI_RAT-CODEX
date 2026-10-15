@@ -8,19 +8,36 @@ const CATEGORIAS = [
     { id: "personales", nombre: "Personales" },
     { id: "vehiculares", nombre: "Vehiculares" },
     { id: "contactos",  nombre: "Contactos" },
+    { id: "inmobiliar", nombre: "Inmobiliario" },
     { id: "otros",      nombre: "Otros" }
 ];
 
+/* key = parámetro de consulta (servicio.html?key=xxx) */
 const SERVICIOS = Object.freeze([
-    { icon: "idcard",    nombre: "DNI",             href: "consulta.html", live: true,  cat: "personales" },
-    { icon: "idcard",    nombre: "DNI Azul",        href: "#", cat: "personales" },
-    { icon: "idcard",    nombre: "DNI Amarillo",    href: "#", cat: "personales" },
-    { icon: "chip",      nombre: "DNI Electrónico", href: "#", cat: "personales" },
-    { icon: "cloud",     nombre: "DNI Virtual",     href: "#", cat: "personales" },
-    { icon: "users",     nombre: "Genealógica",     href: "#", cat: "personales" },
-    { icon: "car",       nombre: "Vehicular",       href: "#", cat: "vehiculares" },
-    { icon: "phone",     nombre: "Teléfonos",       href: "#", cat: "contactos" },
-    { icon: "coin",      nombre: "Sueldos",         href: "#", cat: "otros" },
-    { icon: "briefcase", nombre: "Trabajos",        href: "#", cat: "otros" },
-    { icon: "shield",    nombre: "C4",              href: "#", cat: "otros" }
+    { key: "dni",         icon: "idcard",    nombre: "DNI",             cat: "personales" },
+    { key: "dni-azul",    icon: "idcard",    nombre: "DNI Azul",        cat: "personales" },
+    { key: "dni-amarillo",icon: "idcard",    nombre: "DNI Amarillo",    cat: "personales" },
+    { key: "dni-elec",    icon: "chip",      nombre: "DNI Electrónico", cat: "personales" },
+    { key: "dni-virtual", icon: "cloud",     nombre: "DNI Virtual",     cat: "personales" },
+    { key: "genealogica", icon: "users",     nombre: "Genealógica",      cat: "personales" },
+    { key: "nombre",      icon: "search",    nombre: "Búsqueda por Nombre", cat: "personales" },
+    { key: "vehicular",   icon: "car",       nombre: "Vehicular",       cat: "vehiculares" },
+    { key: "telefonos",   icon: "phone",     nombre: "Teléfonos",       cat: "contactos" },
+    { key: "inmuebles",   icon: "mapPin",    nombre: "Inmuebles",       cat: "inmobiliar" },
+    { key: "sueldos",     icon: "coin",      nombre: "Sueldos",         cat: "otros" },
+    { key: "trabajos",    icon: "briefcase", nombre: "Trabajos",        cat: "otros" },
+    { key: "c4",          icon: "shield",    nombre: "C4",              cat: "otros" }
 ]);
+
+/* Servicios con backend real implementado */
+const LIVE_KEYS = Object.freeze({ dni: true });
+
+function svcHref(s) {
+    return LIVE_KEYS[s.key] ? "consulta.html?key=" + s.key : "servicio.html?key=" + s.key;
+}
+function svcLive(s) {
+    return !!LIVE_KEYS[s.key];
+}
+function svcByKey(key) {
+    return SERVICIOS.find(s => s.key === key) || null;
+}

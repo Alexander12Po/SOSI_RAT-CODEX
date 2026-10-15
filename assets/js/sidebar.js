@@ -13,14 +13,18 @@
             <span class="nav-section">General</span>
             <a href="index.html" class="nav-item ${location.pathname.endsWith("index.html") || location.pathname === "/" ? "active" : ""}">${svgIcon("home", 15)}<span>Inicio</span></a>`;
 
+        const pageFile = location.pathname.split("/").pop() || "index.html";
+        const curKey = new URLSearchParams(location.search).get("key");
+
         CATEGORIAS.forEach(cat => {
             const items = SERVICIOS.filter(s => s.cat === cat.id);
             if (!items.length) return;
-            const activoEnCat = items.some(s => s.href === location.pathname.split("/").pop());
             html += `<span class="nav-section">${cat.nombre}</span>`;
             items.forEach(s => {
-                const esActual = s.href === location.pathname.split("/").pop();
-                html += `<a href="${s.href}" class="nav-item ${esActual ? "active" : ""}">${svgIcon(s.icon, 15)}<span>${s.nombre}</span></a>`;
+                const href = svcHref(s);
+                const file = href.split("?")[0];
+                const esActual = file === pageFile && (curKey === s.key || (file === "consulta.html" && s.key === "dni" && !curKey));
+                html += `<a href="${href}" class="nav-item ${esActual ? "active" : ""}">${svgIcon(s.icon, 15)}<span>${s.nombre}</span></a>`;
             });
         });
 

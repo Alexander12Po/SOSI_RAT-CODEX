@@ -11,12 +11,13 @@
     let textoBusqueda = "";
 
     function tarjeta(s, i) {
-        const btnTxt = s.live ? "Consultar" : "Pronto";
-        const btnIcon = s.live ? svgIcon("search", 11) : "";
-        return `<a href="${s.href}" class="svc ${s.live ? "svc-live" : "svc-soon"}" style="animation-delay:${0.03 * i}s">
+        const live = svcLive(s);
+        const btnTxt = live ? "Consultar" : "Pronto";
+        const btnIcon = live ? svgIcon("search", 11) : "";
+        return `<a href="${svcHref(s)}" class="svc ${live ? "svc-live" : "svc-soon"}" style="animation-delay:${0.03 * i}s">
             <div class="svc-icon">${svgIcon(s.icon, 17)}</div>
             <h3>${s.nombre}</h3>
-            <span class="svc-btn ${s.live ? "" : "soon"}">${btnIcon}${btnTxt}</span>
+            <span class="svc-btn ${live ? "" : "soon"}">${btnIcon}${btnTxt}</span>
         </a>`;
     }
 

@@ -12,6 +12,15 @@
 
     if (!btnConsultar || !dniInput || !resultsSection || !resultsContainer) return;
 
+    /* Título dinámico según servicio (consulta.html?key=dni) */
+    const key = new URLSearchParams(location.search).get("key") || "dni";
+    const svc = svcByKey(key);
+    if (svc) {
+        document.title = svc.nombre + " — SOSI CODEX";
+        const tt = document.querySelector(".topbar-title");
+        if (tt) tt.textContent = "Consulta " + svc.nombre;
+    }
+
     btnConsultar.addEventListener("click", consultarDNI);
     dniInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") consultarDNI();
