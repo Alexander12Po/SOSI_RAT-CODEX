@@ -540,3 +540,64 @@
 .btn-ghost:active, .btn-solid:active { transform: scale(0.96); }
 .btn-solid:hover { filter: brightness(1.15); }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ============================================================
+   Consulta Genealógica (genealogica.html) — v11
+   ============================================================ */
+.gn-form { display: flex; flex-direction: column; gap: 12px; }
+.gn-form .nb-btn { align-self: flex-start; margin-top: 6px; }
+
+.gn-titular {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 12px;
+    animation: fadeUp .35s var(--ease) both;
+}
+.gn-t-avatar {
+    width: 34px; height: 34px; border-radius: 8px; flex: none;
+    display: grid; place-items: center;
+    background: var(--blue-dim); color: var(--blue-bright);
+}
+.gn-t-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.gn-t-name { font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gn-t-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+.gn-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10.5px; font-weight: 600; color: var(--text-md);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 999px; padding: 2px 8px;
+}
+.gn-tag svg { color: var(--blue-bright); }
+
+.gn-tree-card { animation: fadeUp .4s var(--ease) both; }
+.gn-count {
+    margin-left: auto; font-family: var(--font-mono);
+    font-size: 10px; color: var(--text-lo);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 999px; padding: 2px 8px;
+}
+.gn-tree {
+    max-height: 420px; overflow-y: auto;
+    padding: 4px 12px 12px;
+    scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent;
+}
+.gn-line { display: flex; align-items: baseline; gap: 8px; padding: 1px 0; }
+.gn-person .gn-txt { color: #DCE5F5; }
+.gn-plain .gn-txt { color: var(--text-md); }
+.gn-dot {
+    width: 5px; height: 5px; border-radius: 50%; flex: none;
+    background: var(--blue-bright); box-shadow: 0 0 6px var(--blue-glow);
+    transform: translateY(-1px);
+}
+.gn-gap { height: 7px; }
+.gn-txt {
+    font-family: var(--font-mono); font-size: 11px; line-height: 1.55;
+    white-space: pre-wrap; word-break: break-word; margin: 0;
+}
+.ab-pdf { background: var(--blue); border-color: var(--blue); color: #fff; }
+.ab-pdf:hover:not(:disabled) { background: var(--blue-bright); }
+.ab-pdf:disabled { opacity: .6; cursor: wait; }
+@media (max-width: 420px) {
+    .gn-txt { font-size: 10px; }
+    .gn-tree { max-height: 340px; }
+}

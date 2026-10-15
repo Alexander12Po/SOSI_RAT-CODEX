@@ -8,7 +8,8 @@ const CONFIG = Object.freeze({
     ENDPOINTS: {
         estado: "/estado",
         consultaDni: "/consulta-dni",
-        consultaNombre: "/consulta-nombre"
+        consultaNombre: "/consulta-nombre",
+        consultaGenealogica: "/consulta-genealogica"
     },
     LOADER: {
         maxIntentos: 15,
