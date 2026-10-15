@@ -1,6 +1,6 @@
 /* ============================================================
    SOSI CODEX — loader.css
-   Pantalla de arranque
+   Pantalla de arranque compacta
    ============================================================ */
 
 .loader-screen {
@@ -11,43 +11,43 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: opacity 0.5s ease, transform 0.5s ease;
+    transition: opacity 0.4s ease, transform 0.4s ease;
 }
 .loader-screen.out { opacity: 0; transform: scale(1.02); pointer-events: none; }
 
 .loader-content { text-align: center; }
 
 .loader-logo {
-    width: 58px; height: 58px;
-    margin: 0 auto 16px;
-    border-radius: 15px;
+    width: 46px; height: 46px;
+    margin: 0 auto 12px;
+    border-radius: 12px;
     display: grid;
     place-items: center;
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 19px;
+    font-size: 15px;
     letter-spacing: 1px;
-    color: #04120c;
-    background: linear-gradient(135deg, var(--emerald-bright), var(--emerald));
-    box-shadow: 0 0 44px var(--emerald-glow);
-    animation: pulse 1.6s ease-in-out infinite;
+    color: #fff;
+    background: var(--blue);
+    box-shadow: 0 0 34px var(--blue-glow);
+    animation: pulse 1.5s ease-in-out infinite;
 }
 @keyframes pulse {
-    0%, 100% { transform: translateY(0); box-shadow: 0 0 22px var(--emerald-glow); }
-    50% { transform: translateY(-5px); box-shadow: 0 0 52px var(--emerald-glow); }
+    0%, 100% { transform: translateY(0); box-shadow: 0 0 18px var(--blue-glow); }
+    50% { transform: translateY(-4px); box-shadow: 0 0 40px var(--blue-glow); }
 }
 
 .loader-title {
     font-family: var(--font-display);
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 5px;
+    letter-spacing: 4px;
     color: var(--text-hi);
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .loader-bar {
-    width: 190px; height: 3px;
+    width: 160px; height: 3px;
     margin: 0 auto;
     border-radius: 3px;
     background: var(--border);
@@ -56,7 +56,7 @@
 .loader-bar-fill {
     width: 40%; height: 100%;
     border-radius: 3px;
-    background: linear-gradient(90deg, var(--emerald), var(--gold));
+    background: linear-gradient(90deg, var(--blue), var(--blue-bright));
     animation: loadmove 1.2s ease-in-out infinite;
 }
 @keyframes loadmove {
@@ -64,18 +64,18 @@
     100% { transform: translateX(350%); }
 }
 
-.loader-sub { margin-top: 14px; font-size: var(--fs-xs); color: var(--text-lo); }
+.loader-sub { margin-top: 12px; font-size: var(--fs-xs); color: var(--text-lo); }
 
 .loader-retry {
-    margin-top: 14px;
-    padding: 9px 22px;
+    margin-top: 12px;
+    padding: 8px 18px;
     font-size: var(--fs-sm);
     font-weight: 600;
-    color: #04120c;
-    background: var(--emerald-bright);
+    color: #fff;
+    background: var(--blue);
     border: none;
-    border-radius: 9px;
-    box-shadow: 0 4px 18px var(--emerald-glow);
+    border-radius: 7px;
+    box-shadow: 0 4px 14px var(--blue-glow);
     transition: transform 0.2s;
 }
 .loader-retry:hover { transform: translateY(-2px); }

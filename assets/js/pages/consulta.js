@@ -8,6 +8,7 @@
     const dniInput = document.getElementById("dni");
     const resultsSection = document.getElementById("resultsSection");
     const resultsContainer = document.getElementById("resultsContainer");
+    const fieldHint = document.getElementById("fieldHint");
 
     if (!btnConsultar || !dniInput || !resultsSection || !resultsContainer) return;
 
@@ -17,6 +18,7 @@
     });
     dniInput.addEventListener("input", (e) => {
         e.target.value = e.target.value.replace(/\D/g, "").slice(0, CONFIG.DNI.longitud);
+        if (fieldHint) fieldHint.classList.remove("show");
     });
 
     function setLoading(on) {
@@ -43,6 +45,7 @@
         if (dni.length !== CONFIG.DNI.longitud) {
             dniInput.style.animation = "shake 0.4s ease";
             dniInput.style.borderColor = "var(--danger)";
+            if (fieldHint) fieldHint.classList.add("show");
             setTimeout(() => {
                 dniInput.style.borderColor = "";
                 dniInput.style.animation = "";
@@ -50,6 +53,7 @@
             dniInput.focus();
             return;
         }
+        if (fieldHint) fieldHint.classList.remove("show");
 
         setLoading(true);
         showSkeleton();

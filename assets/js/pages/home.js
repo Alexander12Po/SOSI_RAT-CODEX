@@ -1,32 +1,86 @@
 /* ============================================================
-   SOSI CODEX — pages/home.js  (v5)
-   Cuadrícula de servicios: icono + nombre, sin párrafos.
-   Puntos de estado por color (verde = vivo, ámbar = pronto).
+   SOSI CODEX — pages/home.js  (v6 panel compacto)
+   Cuadrícula 2 columnas por categoría + búsqueda real + filtros
    ============================================================ */
 
 (function initHome() {
-    const grid = document.getElementById("servicesGrid");
-    if (!grid) return;
+    const gridHost = document.getElementById("servicesGrid");
+    if (!gridHost) return;
 
-    const SERVICIOS = [
-        { icon: "idcard",     nombre: "DNI",              href: "consulta.html", live: true },
-        { icon: "car",        nombre: "Vehicular",        href: "#" },
-        { icon: "users",      nombre: "Genealógica",      href: "#" },
-        { icon: "phone",      nombre: "Teléfonos",        href: "#" },
-        { icon: "coin",       nombre: "Sueldos",          href: "#" },
-        { icon: "briefcase",  nombre: "Trabajos",         href: "#" },
-        { icon: "shield",     nombre: "C4",               href: "#" },
-        { icon: "cloud",      nombre: "DNI Virtual",      href: "#" },
-        { icon: "idcard",     nombre: "DNI Azul",         href: "#" },
-        { icon: "idcard",     nombre: "DNI Amarillo",     href: "#" },
-        { icon: "chip",       nombre: "DNI Electrónico",  href: "#" }
-    ];
+    let filtroCat = "todas";
+    let textoBusqueda = "";
 
-    grid.innerHTML = SERVICIOS.map((s, i) => `
-        <a href="${s.href}" class="svc ${s.live ? "svc-live" : "svc-soon"}" style="animation-delay:${0.04 * i}s">
-            <div class="svc-icon">${svgIcon(s.icon, 18)}</div>
+    function tarjeta(s, i) {
+        const btnTxt = s.live ? "Consultar" : "Pronto";
+        const btnIcon = s.live ? svgIcon("search", 11) : "";
+        return `<a href="${s.href}" class="svc ${s.live ? "svc-live" : "svc-soon"}" style="animation-delay:${0.03 * i}s">
+            <div class="svc-icon">${svgIcon(s.icon, 17)}</div>
             <h3>${s.nombre}</h3>
-            <span class="svc-go">${svgIcon("arrowRight", 14)}</span>
-        </a>
-    `).join("");
+            <span class="svc-btn ${s.live ? "" : "soon"}">${btnIcon}${btnTxt}</span>
+        </a>`;
+    }
+
+    function render() {
+        const q = textoBusqueda.trim().toLowerCase();
+        let html = "";
+        let total = 0;
+        let idx = 0;
+
+        CATEGORIAS.forEach(cat => {
+            if (filtroCat !== "todas" && filtroCat !== cat.id) return;
+            const items = SERVICIOS.filter(s =>
+                s.cat === cat.id && (!q || s.nombre.toLowerCase().includes(q))
+            );
+            if (!items.length) return;
+            total += items.length;
+            html += `<div class="cat-label">${cat.nombre}</div>
+                <div class="services-grid">${items.map(s => tarjeta(s, idx++)).join("")}</div>`;
+        });
+
+        if (!total) {
+            html = `<div class="services-grid"><div class="no-results show">Sin resultados</div></div>`;
+        }
+        gridHost.innerHTML = html;
+
+        const count = document.getElementById("svcCount");
+        if (count) count.textContent = total + " svcs";
+    }
+
+    /* Chips de categoría */
+    const chipRow = document.getElementById("chipRow");
+    if (chipRow) {
+        const chips = [{ id: "todas", nombre: "Todos" }, ...CATEGORIAS];
+        chipRow.innerHTML = chips.map(c =>
+            `<button class="chip ${c.id === "todas" ? "on" : ""}" data-cat="${c.id}">${c.nombre}</button>`
+        ).join("");
+        chipRow.addEventListener("click", (e) => {
+            const chip = e.target.closest(".chip");
+            if (!chip) return;
+            filtroCat = chip.dataset.cat;
+            chipRow.querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === chip));
+            render();
+        });
+    }
+
+    /* Búsqueda funcional */
+    const input = document.getElementById("svcSearch");
+    const clearBtn = document.getElementById("svcClear");
+    if (input) {
+        input.addEventListener("input", () => {
+            textoBusqueda = input.value;
+            if (clearBtn) clearBtn.classList.toggle("show", !!textoBusqueda);
+            render();
+        });
+    }
+    if (clearBtn) {
+        clearBtn.addEventListener("click", () => {
+            input.value = "";
+            textoBusqueda = "";
+            clearBtn.classList.remove("show");
+            render();
+            input.focus();
+        });
+    }
+
+    render();
 })();

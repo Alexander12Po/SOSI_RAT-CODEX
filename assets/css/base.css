@@ -1,55 +1,63 @@
 /* ============================================================
    SOSI CODEX — base.css
-   Tokens de diseño, reset y utilidades
-   Identidad: negro profundo + esmeralda + oro sutil
+   Panel tecnológico compacto · azul oscuro profesional
    ============================================================ */
 
 :root {
-    /* Paleta */
-    --bg-0: #06090d;
-    --bg-1: #0a0f14;
-    --bg-2: #0e151c;
+    /* Paleta (panel oscuro azulado) */
+    --bg-0: #0B1120;          /* fondo principal */
+    --bg-topbar: #111C35;     /* barra superior */
+    --bg-card: #151F33;       /* tarjetas */
+    --bg-input: #0E1730;      /* campos */
     --surface: rgba(255, 255, 255, 0.03);
-    --surface-2: rgba(255, 255, 255, 0.05);
-    --surface-hover: rgba(255, 255, 255, 0.07);
-    --border: rgba(255, 255, 255, 0.08);
-    --border-strong: rgba(255, 255, 255, 0.14);
+    --surface-hover: rgba(59, 130, 246, 0.08);
+    --border: #273449;        /* bordes */
+    --border-strong: #34456A;
 
-    --emerald: #10b981;
-    --emerald-bright: #34d399;
-    --emerald-dim: rgba(16, 185, 129, 0.14);
-    --emerald-glow: rgba(16, 185, 129, 0.35);
-    --gold: #e3b341;
-    --gold-dim: rgba(227, 179, 65, 0.12);
+    --blue: #2563EB;          /* botones principales */
+    --blue-bright: #3B82F6;   /* resaltado */
+    --blue-dim: rgba(37, 99, 235, 0.16);
+    --blue-glow: rgba(59, 130, 246, 0.35);
+    --gold: #EAB308;
+    --gold-dim: rgba(234, 179, 8, 0.14);
 
-    --text-hi: #f2f6f4;
-    --text-md: #a8b5ae;
-    --text-lo: #64726c;
+    --text-hi: #FFFFFF;       /* texto principal */
+    --text-md: #A7B2C7;       /* texto secundario */
+    --text-lo: #6B7A99;
 
-    --danger: #f87171;
+    --danger: #F87171;
     --danger-dim: rgba(248, 113, 113, 0.12);
+    --ok: #34D399;
+    --ok-dim: rgba(52, 211, 153, 0.14);
+
+    /* Alias heredados (compatibilidad con módulos existentes) */
+    --emerald: var(--blue);
+    --emerald-bright: var(--blue-bright);
+    --emerald-dim: var(--blue-dim);
+    --emerald-glow: var(--blue-glow);
 
     /* Tipografía */
     --font-display: 'Space Grotesk', sans-serif;
     --font-body: 'Inter', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
 
-    /* Escala tipográfica compacta y profesional */
-    --fs-hero: clamp(26px, 3.2vw, 38px);
-    --fs-h2: clamp(18px, 2vw, 22px);
-    --fs-h3: 15px;
-    --fs-body: 14px;
-    --fs-sm: 12.5px;
-    --fs-xs: 11px;
+    /* Escala compacta */
+    --fs-h2: 14px;
+    --fs-h3: 13px;
+    --fs-body: 13px;
+    --fs-sm: 12px;
+    --fs-xs: 10.5px;
 
-    /* Geometría */
-    --r-lg: 16px;
-    --r-md: 12px;
-    --r-sm: 8px;
-    --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.45);
-    --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.55);
-    --sidebar-w: 248px;
-    --topbar-h: 60px;
+    /* Geometría compacta */
+    --r-lg: 10px;
+    --r-md: 8px;
+    --r-sm: 6px;
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
+    --sidebar-w: 240px;
+    --topbar-h: 48px;
+    --page-pad: 12px;
+    --gap: 9px;
 
     /* Movimiento */
     --ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -70,7 +78,7 @@ body {
     text-rendering: optimizeLegibility;
 }
 
-/* Textura ambiental sutil */
+/* Textura ambiental muy sutil (azul) */
 body::before {
     content: "";
     position: fixed;
@@ -78,8 +86,8 @@ body::before {
     pointer-events: none;
     z-index: 0;
     background:
-        radial-gradient(700px 420px at 85% -10%, rgba(16, 185, 129, 0.07), transparent 65%),
-        radial-gradient(560px 380px at -10% 110%, rgba(227, 179, 65, 0.045), transparent 60%);
+        radial-gradient(640px 380px at 85% -10%, rgba(59, 130, 246, 0.06), transparent 65%),
+        radial-gradient(520px 340px at -10% 110%, rgba(37, 99, 235, 0.05), transparent 60%);
 }
 
 h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
