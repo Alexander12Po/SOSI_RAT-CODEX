@@ -7,10 +7,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/base.css?v=4">
-    <link rel="stylesheet" href="assets/css/layout.css?v=4">
-    <link rel="stylesheet" href="assets/css/loader.css?v=4">
-    <link rel="stylesheet" href="assets/css/home.css?v=4">
+    <link rel="stylesheet" href="assets/css/base.css?v=5">
+    <link rel="stylesheet" href="assets/css/layout.css?v=5">
+    <link rel="stylesheet" href="assets/css/loader.css?v=5">
+    <link rel="stylesheet" href="assets/css/home.css?v=5">
 </head>
 <body>
 
@@ -115,65 +115,32 @@
 
         <div class="page-content">
 
-            <!-- HERO -->
+            <!-- HERO: título corto + botón + visual (huella con órbitas, sin tarjetas encima) -->
             <section class="hero">
-                <div>
-                    <span class="hero-eyebrow">Plataforma oficial</span>
-                    <h1 class="hero-title">Datos verificados,<br><em>en segundos.</em></h1>
-                    <p class="hero-desc">Consulta DNI e información registrada al instante, desde cualquier dispositivo.</p>
-                    <div class="hero-actions">
-                        <a href="consulta.html" class="btn btn-primary">
-                            Consultar DNI
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                        </a>
-                        <a href="#servicios" class="btn btn-ghost">Ver servicios</a>
+                <div class="hero-copy">
+                    <span class="hero-eyebrow"></span>
+                    <h1 class="hero-title">SOSI Codex</h1>
+                    <a href="consulta.html" class="quick-btn">
+                        <span class="qb-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M15 8h2M15 12h2M7 16h10"/></svg>
+                        </span>
+                        <span>Consulta DNI</span>
+                        <svg class="qb-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                    <div class="quick-stats">
+                        <span><i class="dot-live"></i>RENIEC</span>
+                        <span><i class="dot-gold"></i>AES</span>
+                        <span><i class="dot-em"></i>24/7</span>
                     </div>
                 </div>
 
                 <div class="hero-visual">
-                    <div class="idcard">
-                        <div class="idcard-head">
-                            <div class="idcard-emblem">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                            </div>
-                            <div class="idcard-org">
-                                <b>REPÚBLICA DEL PERÚ</b>
-                                <span>Documento Nacional de Identidad</span>
-                            </div>
-                        </div>
-                        <div class="idcard-body">
-                            <div class="idcard-photo">
-                                <svg width="34" height="42" viewBox="0 0 60 70" fill="none">
-                                    <circle cx="30" cy="24" r="12" fill="currentColor" opacity="0.5"/>
-                                    <path d="M8 66c0-12 10-21 22-21s22 9 22 21" fill="currentColor" opacity="0.5"/>
-                                </svg>
-                            </div>
-                            <div class="idcard-fields">
-                                <div class="idcard-field"><i>Nombres</i><b>JOSÉ ANTONIO</b></div>
-                                <div class="idcard-field"><i>Apellidos</i><b>OCHOA CRUZ</b></div>
-                                <div class="idcard-field"><i>DNI</i><b class="num">12345678</b></div>
-                            </div>
-                        </div>
-                        <div class="idcard-mrz">P&lt;PEUOCHOACRUZ&lt;&lt;JOSEANTONIO&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;12345678</div>
-                    </div>
-
-                    <div class="float-chip chip-a">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        Verificado
-                    </div>
-                    <div class="float-chip chip-b">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                        Respuesta inmediata
+                    <div class="orbit-ring ring-1"><span class="orbit-dot"></span></div>
+                    <div class="orbit-ring ring-2"><span class="orbit-dot"></span></div>
+                    <div class="pulse-core">
+                        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a4 4 0 00-8 0c0 5 2 8 2 11"/><path d="M12 10a4 4 0 018 0c0 5-2 8-2 11"/><path d="M12 14v7"/><path d="M12 6.5A1.5 1.5 0 0113.5 5 1.5 1.5 0 0015 3.5"/><path d="M12 6.5A1.5 1.5 0 0010.5 5 1.5 1.5 0 019 3.5"/><path d="M4.5 13c0 4 1.5 6 1.5 8"/><path d="M19.5 13c0 4-1.5 6-1.5 8"/></svg>
                     </div>
                 </div>
-            </section>
-
-            <!-- MÉTRICAS -->
-            <section class="metrics">
-                <div class="metric"><b>11</b><i>Líneas de consulta</i></div>
-                <div class="metric"><b><span>&lt;5s</span></b><i>Tiempo de respuesta</i></div>
-                <div class="metric"><b>24/7</b><i>Disponibilidad</i></div>
-                <div class="metric"><b>AES</b><i>Conexión cifrada</i></div>
             </section>
 
             <!-- SERVICIOS -->
@@ -193,10 +160,10 @@
         </footer>
     </main>
 
-    <script src="assets/js/config.js?v=4"></script>
-    <script src="assets/js/icons.js?v=4"></script>
-    <script src="assets/js/loader.js?v=4"></script>
-    <script src="assets/js/sidebar.js?v=4"></script>
-    <script src="assets/js/pages/home.js?v=4"></script>
+    <script src="assets/js/config.js?v=5"></script>
+    <script src="assets/js/icons.js?v=5"></script>
+    <script src="assets/js/loader.js?v=5"></script>
+    <script src="assets/js/sidebar.js?v=5"></script>
+    <script src="assets/js/pages/home.js?v=5"></script>
 </body>
 </html>

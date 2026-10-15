@@ -22,8 +22,8 @@
     function setLoading(on) {
         btnConsultar.disabled = on;
         btnConsultar.innerHTML = on
-            ? `<svg class="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICONS.spinner}</svg> Consultando…`
-            : `${svgIcon("search", 16)} Consultar`;
+            ? `<svg class="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICONS.spinner}</svg>`
+            : svgIcon("search", 16);
     }
 
     function showSkeleton() {

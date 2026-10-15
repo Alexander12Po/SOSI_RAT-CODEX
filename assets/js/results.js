@@ -68,7 +68,6 @@ function profileBand(d, fotoSrc) {
         <div class="pb-photo">${photoHTML}</div>
         <div class="pb-info">
             <div class="pb-name">${escapeHTML(`${d.nombres || "—"} ${d.apellidos || ""}`.trim())}</div>
-            <div class="pb-sub">Registro RENIEC · Documento Nacional de Identidad</div>
             <div class="pb-tags">
                 <span class="pb-tag t-dni">${svgIcon("idcard", 12)} ${escapeHTML(d.dni || "—")}</span>
                 ${d.genero ? `<span class="pb-tag">${escapeHTML(d.genero)}</span>` : ""}

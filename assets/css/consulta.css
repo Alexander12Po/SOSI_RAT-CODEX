@@ -12,19 +12,18 @@
 .search-panel {
     display: flex;
     align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
+    gap: 12px;
     background: linear-gradient(160deg, var(--surface-2), var(--surface));
     border: 1px solid var(--border-strong);
-    border-radius: var(--r-lg);
-    padding: 16px 18px;
+    border-radius: 99px;
+    padding: 8px 8px 8px 16px;
     box-shadow: var(--shadow-md);
-    margin-bottom: 22px;
+    margin-bottom: 18px;
 }
 
 .search-panel .sp-icon {
-    width: 40px; height: 40px;
-    border-radius: 10px;
+    width: 34px; height: 34px;
+    border-radius: 50%;
     display: grid;
     place-items: center;
     color: var(--emerald-bright);
@@ -32,15 +31,6 @@
     border: 1px solid rgba(16, 185, 129, 0.22);
     flex-shrink: 0;
 }
-
-.sp-meta { flex-shrink: 0; margin-right: auto; }
-.sp-meta b {
-    display: block;
-    font-family: var(--font-display);
-    font-size: var(--fs-h3);
-    font-weight: 700;
-}
-.sp-meta span { font-size: var(--fs-xs); color: var(--text-lo); }
 
 .input-group {
     display: flex;
@@ -52,36 +42,38 @@
 
 #dni {
     flex: 1;
-    height: 44px;
-    padding: 0 16px;
+    height: 42px;
+    padding: 0 10px;
     font-family: var(--font-mono);
     font-size: 15px;
     letter-spacing: 0.18em;
     color: var(--text-hi);
-    background: var(--bg-1);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    background: transparent;
+    border: none;
     outline: none;
     transition: all 0.25s var(--ease);
 }
 #dni::placeholder { color: var(--text-lo); letter-spacing: 0.1em; }
-#dni:focus {
+#dni:focus { box-shadow: none; }
+.search-panel:focus-within {
     border-color: rgba(16, 185, 129, 0.5);
-    box-shadow: 0 0 0 3px var(--emerald-dim);
+    box-shadow: 0 0 0 3px var(--emerald-dim), var(--shadow-md);
 }
 
 #btnConsultar {
-    height: 44px;
-    padding: 0 22px;
+    height: 42px;
+    width: 42px;
+    padding: 0;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     font-size: var(--fs-sm);
     font-weight: 700;
     color: #04120c;
     background: linear-gradient(135deg, var(--emerald-bright), var(--emerald));
     border: none;
-    border-radius: 10px;
+    border-radius: 50%;
     box-shadow: 0 4px 18px var(--emerald-glow);
     transition: all 0.25s var(--ease);
     white-space: nowrap;
@@ -100,13 +92,13 @@
 .profile-band {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 18px;
     background:
         radial-gradient(480px 160px at 12% -40%, rgba(16, 185, 129, 0.12), transparent 70%),
         var(--bg-1);
     border: 1px solid var(--border-strong);
     border-radius: var(--r-lg);
-    padding: 18px 22px;
+    padding: 16px 20px;
 }
 
 .pb-photo {
@@ -125,7 +117,7 @@
 .pb-info { flex: 1; min-width: 0; }
 .pb-name {
     font-family: var(--font-display);
-    font-size: clamp(17px, 2vw, 21px);
+    font-size: clamp(16px, 1.8vw, 19px);
     font-weight: 700;
     line-height: 1.2;
     margin-bottom: 3px;
@@ -328,8 +320,7 @@
     .cards-masonry { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
-    .search-panel { padding: 14px; }
-    .sp-meta { margin-right: 0; width: 100%; }
+    .search-panel { padding: 7px 7px 7px 12px; }
     .input-group { width: 100%; }
     .profile-band { flex-wrap: wrap; padding: 16px; }
     .pb-status { text-align: left; }
