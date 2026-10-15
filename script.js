@@ -26,7 +26,7 @@ if (loaderScreen) {
             if (sub) sub.textContent = "El servidor esta tardando mas de lo normal.";
             const btn = document.createElement("button");
             btn.textContent = "Reintentar";
-            btn.style.cssText = "margin-top:16px;padding:10px 20px;background:var(--rojo);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;";
+            btn.className = "loader-retry";
             btn.onclick = () => {
                 btn.remove();
                 if (sub) sub.textContent = "Inicializando plataforma segura...";
@@ -84,7 +84,7 @@ async function consultarDNI() {
     const dni = dniInput.value.trim();
     if (dni.length !== 8) {
         dniInput.style.animation = "shake 0.4s ease";
-        dniInput.style.borderColor = "var(--rojo)";
+        dniInput.style.borderColor = "var(--danger)";
         setTimeout(() => {
             dniInput.style.borderColor = "";
             dniInput.style.animation = "";
