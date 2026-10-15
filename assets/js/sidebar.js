@@ -23,7 +23,7 @@
             items.forEach(s => {
                 const href = svcHref(s);
                 const file = href.split("?")[0];
-                const esActual = file === pageFile && (curKey === s.key || (file === "consulta.html" && s.key === "dni" && !curKey));
+                const esActual = file === pageFile && (curKey === s.key || (!curKey && (file === "consulta.html" && s.key === "dni") || (file === "nombre.html" && s.key === "nombre")));
                 html += `<a href="${href}" class="nav-item ${esActual ? "active" : ""}">${svgIcon(s.icon, 15)}<span>${s.nombre}</span></a>`;
             });
         });

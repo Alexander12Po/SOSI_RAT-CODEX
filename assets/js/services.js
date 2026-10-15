@@ -32,7 +32,9 @@ const SERVICIOS = Object.freeze([
 /* Servicios con backend real implementado */
 const LIVE_KEYS = Object.freeze({ dni: true });
 
+/* Página propia por servicio (fuera de consulta.html) */
 function svcHref(s) {
+    if (s.key === "nombre") return "nombre.html";
     return LIVE_KEYS[s.key] ? "consulta.html?key=" + s.key : "servicio.html?key=" + s.key;
 }
 function svcLive(s) {

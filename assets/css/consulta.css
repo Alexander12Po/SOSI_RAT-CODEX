@@ -452,6 +452,82 @@
 }
 .svc-pending-msg { font-size: 12px; color: var(--text-2); margin: 0; max-width: 300px; line-height: 1.5; }
 .svc-pending-actions { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; justify-content: center; }
+
+/* ============ FORMULARIO VERTICAL — BÚSQUEDA POR NOMBRE ============ */
+.nb-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;                       /* separación uniforme entre grupos */
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 16px 14px;
+    margin-bottom: 12px;
+    width: 100%;
+}
+
+.nb-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.nb-label {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--text-2);
+    letter-spacing: 0.02em;
+    padding-left: 2px;
+}
+
+.nb-input {
+    width: 100%;                     /* mismo ancho, casi todo el disponible */
+    height: 42px;                    /* misma altura en los tres campos */
+    box-sizing: border-box;
+    padding: 0 14px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--text-hi);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 10px;             /* esquinas redondeadas */
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.nb-input::placeholder { color: var(--text-lo); }
+.nb-input:focus {
+    border-color: var(--blue-bright);
+    box-shadow: 0 0 0 3px var(--blue-dim);
+}
+.nb-input.nb-invalid {
+    border-color: var(--danger);
+    animation: shake 0.4s ease;
+}
+
+.nb-btn {
+    align-self: flex-start;          /* alineado a la izquierda */
+    margin-top: 6px;                 /* espacio respecto al último campo */
+    height: 40px;
+    padding: 0 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;                        /* texto «Buscar» + lupa a su derecha */
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #fff;
+    background: var(--blue);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+}
+.nb-btn:hover:not(:disabled) { background: var(--blue-bright); }
+.nb-btn:active:not(:disabled) { transform: scale(0.96); }
+.nb-btn:disabled { opacity: 0.65; cursor: wait; }
+.nb-btn svg.spin { animation: spin 0.9s linear infinite; }
 .btn-ghost, .btn-solid {
     font-size: 12px; font-weight: 600;
     border-radius: 8px;

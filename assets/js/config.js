@@ -7,7 +7,8 @@ const CONFIG = Object.freeze({
     BACKEND_URL: "https://backend-dni.onrender.com",
     ENDPOINTS: {
         estado: "/estado",
-        consultaDni: "/consulta-dni"
+        consultaDni: "/consulta-dni",
+        consultaNombre: "/consulta-nombre"
     },
     LOADER: {
         maxIntentos: 15,
