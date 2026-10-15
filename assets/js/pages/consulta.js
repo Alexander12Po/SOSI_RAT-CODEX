@@ -21,6 +21,19 @@
         if (fieldHint) fieldHint.classList.remove("show");
     });
 
+    // Estado actual para copiar/descargar desde los resultados
+    let lastResult = null;
+    wireExport(resultsContainer, () => lastResult);
+
+    // "Nueva" limpia y devuelve el foco al input
+    resultsContainer.addEventListener("click", (e) => {
+        if (e.target.closest("#btnNueva")) {
+            dniInput.value = "";
+            lastResult = null;
+            setTimeout(() => dniInput.focus(), 50);
+        }
+    });
+
     function setLoading(on) {
         btnConsultar.disabled = on;
         btnConsultar.innerHTML = on
@@ -68,9 +81,11 @@
 
             resultsContainer.innerHTML = "";
             if (!data.success) {
+                lastResult = null;
                 showError(resultsContainer, data.error || "No se encontró información para este DNI.");
             } else {
-                renderResults(resultsContainer, data);
+                lastResult = { dni, texto: data.texto || "", imagen: data.imagen || "" };
+                renderResults(resultsContainer, lastResult);
             }
             setTimeout(() => {
                 resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });

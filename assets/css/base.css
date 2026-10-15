@@ -17,7 +17,7 @@
     --blue: #2563EB;          /* botones principales */
     --blue-bright: #3B82F6;   /* resaltado */
     --blue-dim: rgba(37, 99, 235, 0.16);
-    --blue-glow: rgba(59, 130, 246, 0.35);
+    --blue-glow: rgba(59, 130, 246, 0.18);
     --gold: #EAB308;
     --gold-dim: rgba(234, 179, 8, 0.14);
 

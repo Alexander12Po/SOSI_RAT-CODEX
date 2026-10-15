@@ -13,13 +13,17 @@ function escapeHTML(str) {
 
 function rowItem(item) {
     const valCls = ["data-value"];
-    if (!item.value || item.value === "—") valCls.push("v-empty");
+    const raw = String(item.value ?? "—");
+    const empty = !item.value || item.value === "—" || item.value === "";
+    if (empty) valCls.push("v-empty");
     if (item.code) valCls.push("v-code");
     if (item.date) valCls.push("v-date");
     if (item.cls) valCls.push(item.cls);
+    const copyBtn = empty ? "" :
+        `<button class="row-copy" data-export="copy-field" aria-label="Copiar ${item.label}" title="Copiar">${svgIcon("copy", 11)}</button>`;
     return `<div class="data-row">
         <span class="data-label">${item.label}</span>
-        <span class="${valCls.join(" ")}">${escapeHTML(String(item.value ?? "—"))}</span>
+        <span class="rv"><span class="${valCls.join(" ")}">${escapeHTML(raw)}</span>${copyBtn}</span>
     </div>`;
 }
 
@@ -70,10 +74,10 @@ function profileBand(d, fotoSrc) {
             <div class="pb-name">${escapeHTML(`${d.nombres || "—"} ${d.apellidos || ""}`.trim())}</div>
             <div class="pb-tags">
                 <span class="pb-tag t-dni">${svgIcon("idcard", 12)} ${escapeHTML(d.dni || "—")}</span>
-                ${d.genero ? `<span class="pb-tag">${escapeHTML(d.genero)}</span>` : ""}
-                ${d.edad ? `<span class="pb-tag">${escapeHTML(d.edad)} años</span>` : ""}
-                ${civil ? `<span class="pb-tag">${escapeHTML(civil)}</span>` : ""}
-                ${d.restriccion ? `<span class="pb-tag t-gold">Restricción: ${escapeHTML(d.restriccion)}</span>` : ""}
+                ${d.genero ? `<span class="pb-tag">${svgIcon("user", 11)} ${escapeHTML(d.genero)}</span>` : ""}
+                ${d.edad ? `<span class="pb-tag">${svgIcon("calendar", 11)} ${escapeHTML(d.edad)} años</span>` : ""}
+                ${civil ? `<span class="pb-tag">${svgIcon("users", 11)} ${escapeHTML(civil)}</span>` : ""}
+                ${d.restriccion ? `<span class="pb-tag t-gold">${svgIcon("alert", 11)} ${escapeHTML(d.restriccion)}</span>` : ""}
             </div>
         </div>
         <div class="pb-status">
@@ -81,6 +85,15 @@ function profileBand(d, fotoSrc) {
                 ? `<span class="pill ${estado.ok ? "pill-ok" : "pill-warn"}">${svgIcon(estado.ok ? "check" : "alert", 12)} ${estado.texto}</span>`
                 : `<span class="pill pill-ok">${svgIcon("shieldCheck", 12)} Verificado</span>`}
         </div>
+    </div>`;
+}
+
+/** Barra de acciones bajo el perfil: copiar todo / descargar foto */
+function actionBar(dni, tieneFoto) {
+    return `<div class="action-bar">
+        <button class="ab-btn" data-export="copy">${svgIcon("copy", 13)}<span>Copiar datos</span></button>
+        <button class="ab-btn ${tieneFoto ? "" : "is-off"}" data-export="photo">${svgIcon("download", 13)}<span>Descargar foto</span></button>
+        <a class="ab-btn ab-new" href="#dni" id="btnNueva">${svgIcon("search", 13)}<span>Nueva</span></a>
     </div>`;
 }
 
@@ -106,9 +119,14 @@ function renderResults(container, data) {
     const d = parseTexto(data.texto);
     const fotoSrc = data.imagen ? "data:image/jpeg;base64," + data.imagen : "";
 
-    // Fallback: si el parseo falla, mostrar texto crudo tal cual
+    // Fallback: si el parseo falla, mostrar texto crudo tal cual + copiar
     if (camposLlenos(d) < 2 && data.texto) {
-        container.innerHTML = rawCard(data.texto, fotoSrc);
+        container.innerHTML = `
+            ${rawCard(data.texto, fotoSrc)}
+            <div class="action-bar">
+                <button class="ab-btn" data-export="copy">${svgIcon("copy", 13)}<span>Copiar respuesta</span></button>
+                ${fotoSrc ? `<button class="ab-btn" data-export="photo">${svgIcon("download", 13)}<span>Descargar foto</span></button>` : ""}
+            </div>`;
         return;
     }
 
@@ -154,6 +172,7 @@ function renderResults(container, data) {
 
     container.innerHTML = `
         ${band}
+        ${actionBar(d.dni, !!fotoSrc)}
         <div class="cards-masonry">${cards}</div>
     `;
 }

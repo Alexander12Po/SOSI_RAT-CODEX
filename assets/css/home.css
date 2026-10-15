@@ -21,12 +21,9 @@
     background: var(--blue);
     box-shadow: 0 0 16px var(--blue-glow);
     flex-shrink: 0;
-    animation: corePulse 3s ease-in-out infinite;
+    
 }
-@keyframes corePulse {
-    0%, 100% { box-shadow: 0 0 10px var(--blue-glow); }
-    50%      { box-shadow: 0 0 22px var(--blue-glow); }
-}
+
 .ph-title { font-size: 15px; font-weight: 700; line-height: 1.1; }
 .ph-sub { font-size: var(--fs-xs); color: var(--text-md); margin-top: 1px; }
 .ph-count {
