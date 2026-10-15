@@ -1,0 +1,11 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/^\\/$", "destination": "/index.html" },
+    { "source": "/consulta", "destination": "/consulta.html" },
+    { "source": "/nombre", "destination": "/nombre.html" },
+    { "source": "/genealogica", "destination": "/genealogica.html" },
+    { "source": "/servicio", "destination": "/servicio.html" }
+  ]
+}

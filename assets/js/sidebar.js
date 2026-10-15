@@ -8,12 +8,12 @@
     const nav = document.getElementById("sidebarNav");
 
     /* Generar dinámicamente las opciones reales del proyecto */
-    if (nav && typeof SERVICIOS !== "undefined") {
+    let pageFile = location.pathname.replace(/^\/+/, "").replace(/\.html$/, "") || "index";
+    if (typeof SERVICIOS !== "undefined") {
         let html = `
             <span class="nav-section">General</span>
-            <a href="index.html" class="nav-item ${location.pathname.endsWith("index.html") || location.pathname === "/" ? "active" : ""}">${svgIcon("home", 15)}<span>Inicio</span></a>`;
+            <a href="/" class="nav-item ${pageFile === "index" ? "active" : ""}">${svgIcon("home", 15)}<span>Inicio</span></a>`;
 
-        const pageFile = location.pathname.split("/").pop() || "index.html";
         const curKey = new URLSearchParams(location.search).get("key");
 
         CATEGORIAS.forEach(cat => {
@@ -22,13 +22,13 @@
             html += `<span class="nav-section">${cat.nombre}</span>`;
             items.forEach(s => {
                 const href = svcHref(s);
-                const file = href.split("?")[0];
-                const esActual = file === pageFile && (curKey === s.key || (!curKey && (file === "consulta.html" && s.key === "dni") || (file === "nombre.html" && s.key === "nombre") || (file === "genealogica.html" && s.key === "genealogica")));
+                const file = href.split("?")[0].replace(/\.html$/, "").replace(/^\/+/, "") || "index";
+                const esActual = file === pageFile && (curKey === s.key || !curKey);
                 html += `<a href="${href}" class="nav-item ${esActual ? "active" : ""}">${svgIcon(s.icon, 15)}<span>${s.nombre}</span></a>`;
             });
         });
 
-        nav.innerHTML = html;
+        if (nav) nav.innerHTML = html;
     }
 
     const sidebar = document.getElementById("sidebar");
