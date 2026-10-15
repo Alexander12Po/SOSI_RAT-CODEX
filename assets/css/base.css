@@ -1,0 +1,116 @@
+/* ============================================================
+   SOSI CODEX — base.css
+   Tokens de diseño, reset y utilidades
+   Identidad: negro profundo + esmeralda + oro sutil
+   ============================================================ */
+
+:root {
+    /* Paleta */
+    --bg-0: #06090d;
+    --bg-1: #0a0f14;
+    --bg-2: #0e151c;
+    --surface: rgba(255, 255, 255, 0.03);
+    --surface-2: rgba(255, 255, 255, 0.05);
+    --surface-hover: rgba(255, 255, 255, 0.07);
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+
+    --emerald: #10b981;
+    --emerald-bright: #34d399;
+    --emerald-dim: rgba(16, 185, 129, 0.14);
+    --emerald-glow: rgba(16, 185, 129, 0.35);
+    --gold: #e3b341;
+    --gold-dim: rgba(227, 179, 65, 0.12);
+
+    --text-hi: #f2f6f4;
+    --text-md: #a8b5ae;
+    --text-lo: #64726c;
+
+    --danger: #f87171;
+    --danger-dim: rgba(248, 113, 113, 0.12);
+
+    /* Tipografía */
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Escala tipográfica compacta y profesional */
+    --fs-hero: clamp(26px, 3.2vw, 38px);
+    --fs-h2: clamp(18px, 2vw, 22px);
+    --fs-h3: 15px;
+    --fs-body: 14px;
+    --fs-sm: 12.5px;
+    --fs-xs: 11px;
+
+    /* Geometría */
+    --r-lg: 16px;
+    --r-md: 12px;
+    --r-sm: 8px;
+    --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.55);
+    --sidebar-w: 248px;
+    --topbar-h: 60px;
+
+    /* Movimiento */
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    background: var(--bg-0);
+    color: var(--text-hi);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+/* Textura ambiental sutil */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+        radial-gradient(700px 420px at 85% -10%, rgba(16, 185, 129, 0.07), transparent 65%),
+        radial-gradient(560px 380px at -10% 110%, rgba(227, 179, 65, 0.045), transparent 60%);
+}
+
+h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+input { font-family: inherit; }
+
+::selection { background: var(--emerald-dim); color: var(--emerald-bright); }
+
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: var(--bg-0); }
+::-webkit-scrollbar-thumb { background: #1e2a26; border-radius: 8px; border: 2px solid var(--bg-0); }
+::-webkit-scrollbar-thumb:hover { background: #2c3d37; }
+
+/* Utilidades */
+.text-accent { color: var(--emerald-bright); }
+.text-gold { color: var(--gold); }
+.mono { font-family: var(--font-mono); }
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+}
+@keyframes blinkDot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+}
