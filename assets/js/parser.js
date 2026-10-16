@@ -32,7 +32,11 @@ function parseTexto(texto) {
         if (idx === -1) return;
 
         const key = limpio.slice(0, idx).trim().toUpperCase();
-        const val = limpio.slice(idx + 1).trim();
+        // El valor puede venir con markdown: **X**, `X`, _X_ → se limpia
+        let val = limpio.slice(idx + 1).trim()
+            .replace(/^[*`_]+\s*/, "")
+            .replace(/\s*[*`_]+$/, "")
+            .replace(/`/g, "");
         if (!val) return;
 
         switch (key) {
@@ -46,7 +50,12 @@ function parseTexto(texto) {
                 r.edad = p[1] ? p[1].replace("(", "").replace(")", "").replace(/a[nñ]os/i, "").trim() : "";
                 break;
             }
-            case "EDAD": if (!r.edad) r.edad = val; break;
+            case "EDAD":
+                if (!r.edad) {
+                    const em = val.match(/(\d+)/);
+                    r.edad = em ? em[1] : val;
+                }
+                break;
             case "DEPARTAMENTO":
                 if (!vistoDepartamento) { r.departamentoNac = val; vistoDepartamento = true; }
                 else { r.departamentoDir = val; }

@@ -119,6 +119,9 @@
             </div>`;
     }
 
+    /* Botón "Copiar texto" → usa export.js con texto plano profesional */
+    wireExport(resultsContainer, () => lastResult);
+
     /* ---------- Consulta ---------- */
 
     async function consultar(e) {
@@ -151,7 +154,12 @@
                 lastResult = null;                       /* sin resultado → sin botón PDF */
                 showError(resultsContainer, data.error || "No se encontró información genealógica para este DNI.");
             } else {
-                lastResult = { dni, texto: data.texto };
+                lastResult = {
+                    dni,
+                    texto: data.texto,
+                    // Copiado limpio: sin ruido del bot ni markdown (export.js)
+                    plano: formatoPlano(PDFX.normalize(data.texto), null)
+                };
                 renderArbol(resultsContainer, lastResult);
                 HIST.push("genealogica", { label: dni, kind: "DNI" });
                 if (idle) idle.refresh();

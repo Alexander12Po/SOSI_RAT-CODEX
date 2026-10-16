@@ -21,7 +21,8 @@ function rowItem(item) {
     if (item.cls) valCls.push(item.cls);
     const copyBtn = empty ? "" :
         `<button class="row-copy" data-export="copy-field" aria-label="Copiar ${item.label}" title="Copiar">${svgIcon("copy", 11)}</button>`;
-    return `<div class="data-row">
+    // data-value: valor EXACTO para copiar (sin markdown ni decoración)
+    return `<div class="data-row" data-value="${escapeHTML(String(item.value ?? ""))}">
         <span class="data-label">${item.label}</span>
         <span class="rv"><span class="${valCls.join(" ")}">${escapeHTML(raw)}</span>${copyBtn}</span>
     </div>`;
@@ -118,6 +119,11 @@ function rawCard(texto, fotoSrc) {
 function renderResults(container, data) {
     const d = parseTexto(data.texto);
     const fotoSrc = data.imagen ? "data:image/jpeg;base64," + data.imagen : "";
+
+    // Texto plano profesional pre-generado para el botón Copiar.
+    // Se guarda en data-* para que export.js lo use directamente.
+    data.datos = d;
+    data.plano = formatoPlano(data.texto, d);
 
     // Fallback: si el parseo falla, mostrar texto crudo tal cual + copiar
     if (camposLlenos(d) < 2 && data.texto) {

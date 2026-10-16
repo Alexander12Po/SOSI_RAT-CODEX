@@ -100,7 +100,7 @@
                 lastResult = null;
                 showError(resultsContainer, data.error || "No se encontraron personas con ese nombre.");
             } else {
-                lastResult = { dni: "", texto: data.texto || "", imagen: data.imagen || "" };
+                lastResult = { dni: "", texto: data.texto || "", imagen: data.imagen || "", datos: null, plano: "" };
                 renderResults(resultsContainer, lastResult);
                 HIST.push("nombre", { label: [nombres, paterno, materno].filter(Boolean).join(", "), kind: "Nombre" });
                 if (idle) idle.refresh();

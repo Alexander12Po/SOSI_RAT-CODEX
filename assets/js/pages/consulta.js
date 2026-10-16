@@ -111,7 +111,7 @@
                 lastResult = null;
                 showError(resultsContainer, data.error || "No se encontró información para este DNI.");
             } else {
-                lastResult = { dni, texto: data.texto || "", imagen: data.imagen || "" };
+                lastResult = { dni, texto: data.texto || "", imagen: data.imagen || "", datos: null, plano: "" };
                 renderResults(resultsContainer, lastResult);
                 HIST.push("dni", { label: dni, kind: "DNI" });
                 if (idle) idle.refresh();
