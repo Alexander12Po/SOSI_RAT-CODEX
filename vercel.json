@@ -1,6 +1,14 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/googlea077710d7ee7dd78(.html)?",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    }
+  ],
   "rewrites": [
     { "source": "/^\\/$", "destination": "/index.html" },
     { "source": "/consulta", "destination": "/consulta.html" },
