@@ -9,15 +9,12 @@ const HIST = {
     _key(page) { return 'sosi-hist-' + page; },
 
     load(page) {
-        try { return JSON.parse(localStorage.getItem(this._key(page))) || []; }
-        catch (e) { return []; }
+        /* historial eliminado: limpia cualquier registro guardado en versiones anteriores */
+        try { localStorage.removeItem(this._key(page)); } catch (e) {}
+        return [];
     },
 
-    push(page, item) {
-        const list = this.load(page).filter(x => x.label !== item.label);
-        list.unshift({ ...item, t: Date.now() });
-        localStorage.setItem(this._key(page), JSON.stringify(list.slice(0, this.MAX)));
-    },
+    push(page, item) { /* historial desactivado por solicitud del usuario */ },
 
     clear(page) { localStorage.removeItem(this._key(page)); }
 };
