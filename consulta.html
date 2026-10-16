@@ -11,10 +11,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/base.css?v=12">
-<link rel="stylesheet" href="assets/css/layout.css?v=12">
-<link rel="stylesheet" href="assets/css/loader.css?v=12">
-<link rel="stylesheet" href="assets/css/consulta.css?v=12">
+<link rel="stylesheet" href="assets/css/base.css?v=13">
+<link rel="stylesheet" href="assets/css/layout.css?v=13">
+<link rel="stylesheet" href="assets/css/loader.css?v=13">
+<link rel="stylesheet" href="assets/css/consulta.css?v=13">
 </head>
 <body>
 
@@ -77,6 +77,12 @@
       </div>
       <p class="field-hint" id="fieldHint">El DNI debe tener 8 dígitos.</p>
 
+      <!-- Aviso / instrucciones -->
+      <div id="tipCard"></div>
+
+      <!-- Estado inicial + búsquedas recientes -->
+      <section id="idleSection"></section>
+
       <!-- Resultados -->
       <section id="resultsSection" style="display:none">
         <div class="results-grid" id="resultsContainer"></div>
@@ -86,14 +92,15 @@
   </div>
 </main>
 
-<script src="assets/js/config.js?v=12"></script>
-<script src="assets/js/icons.js?v=12"></script>
-<script src="assets/js/services.js?v=12"></script>
-<script src="assets/js/parser.js?v=12"></script>
-<script src="assets/js/results.js?v=12"></script>
-<script src="assets/js/export.js?v=12"></script>
-<script src="assets/js/loader.js?v=12"></script>
-<script src="assets/js/sidebar.js?v=12"></script>
-<script src="assets/js/pages/consulta.js?v=12"></script>
+<script src="assets/js/config.js?v=13"></script>
+<script src="assets/js/icons.js?v=13"></script>
+<script src="assets/js/services.js?v=13"></script>
+<script src="assets/js/parser.js?v=13"></script>
+<script src="assets/js/results.js?v=13"></script>
+<script src="assets/js/export.js?v=13"></script>
+<script src="assets/js/loader.js?v=13"></script>
+<script src="assets/js/history.js?v=13"></script>
+<script src="assets/js/sidebar.js?v=13"></script>
+<script src="assets/js/pages/consulta.js?v=13"></script>
 </body>
 </html>

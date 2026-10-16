@@ -9,6 +9,7 @@
     const resultsSection = document.getElementById("resultsSection");
     const resultsContainer = document.getElementById("resultsContainer");
     const fieldHint = document.getElementById("fieldHint");
+    const idleSection = document.getElementById("idleSection");
 
     if (!btnConsultar || !dniInput || !resultsSection || !resultsContainer) return;
 
@@ -19,6 +20,22 @@
         document.title = svc.nombre + " — SOSI CODEX";
         const tt = document.querySelector(".topbar-title");
         if (tt) tt.textContent = "Consulta " + svc.nombre;
+    }
+
+    /* --- v13: instrucciones + empty state + historial --- */
+    HISTORY_UI.mountTips("tipCard", [
+        "Ingrese los 8 dígitos del DNI, sin espacios ni puntos.",
+        "Puede pegar el número; se aceptan solo dígitos.",
+        "Use Enter para buscar más rápido."
+    ]);
+    const idle = idleSection ? HISTORY_UI.create(idleSection, {
+        page: "dni",
+        title: "Realiza una consulta",
+        subtitle: "Los resultados aparecerán aquí una vez completada la búsqueda.",
+        onPick: (it) => { dniInput.value = it.label; consultarDNI(); }
+    }) : null;
+    if (document.body.classList.contains("no-results")) {
+        document.body.classList.remove("no-results");
     }
 
     btnConsultar.addEventListener("click", consultarDNI);
@@ -51,6 +68,7 @@
     }
 
     function showSkeleton() {
+        if (idle) idle.hide();
         resultsSection.style.display = "block";
         resultsContainer.className = "results-grid";
         resultsContainer.innerHTML = `
@@ -95,6 +113,8 @@
             } else {
                 lastResult = { dni, texto: data.texto || "", imagen: data.imagen || "" };
                 renderResults(resultsContainer, lastResult);
+                HIST.push("dni", { label: dni, kind: "DNI" });
+                if (idle) idle.refresh();
             }
             setTimeout(() => {
                 resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });

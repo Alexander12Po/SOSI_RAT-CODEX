@@ -12,11 +12,31 @@
     const inpMaterno = document.getElementById("nbMaterno");
     const resultsSection = document.getElementById("resultsSection");
     const resultsContainer = document.getElementById("resultsContainer");
+    const idleSection = document.getElementById("idleSection");
 
     if (!form || !btn || !inpNombres || !inpPaterno || !inpMaterno) return;
 
     let lastResult = null;
     wireExport(resultsContainer, () => lastResult);
+
+    /* --- v13: instrucciones + empty state + historial --- */
+    HISTORY_UI.mountTips("tipCard", [
+        "La búsqueda requiere al menos nombres y apellido paterno.",
+        "Escriba solo letras, sin números ni símbolos.",
+        "Tildes y ñ son bienvenidas (ej. Nuñez, Ávila)."
+    ]);
+    const idle = idleSection ? HISTORY_UI.create(idleSection, {
+        page: "nombre",
+        title: "Realiza una consulta",
+        subtitle: "Los resultados aparecerán aquí una vez completada la búsqueda.",
+        onPick: (it) => {
+            const parts = it.label.split(", ");
+            inpNombres.value = parts[0] || "";
+            inpPaterno.value = parts[1] || "";
+            inpMaterno.value = parts[2] || "";
+            form.requestSubmit ? form.requestSubmit() : buscar();
+        }
+    }) : null;
 
     /* Solo letras, espacios, apóstrofes y tildes — sin números */
     [inpNombres, inpPaterno, inpMaterno].forEach(inp => {
@@ -33,6 +53,7 @@
     }
 
     function showSkeleton() {
+        if (idle) idle.hide();
         resultsSection.style.display = "block";
         resultsContainer.className = "results-grid";
         resultsContainer.innerHTML = `
@@ -81,6 +102,8 @@
             } else {
                 lastResult = { dni: "", texto: data.texto || "", imagen: data.imagen || "" };
                 renderResults(resultsContainer, lastResult);
+                HIST.push("nombre", { label: [nombres, paterno, materno].filter(Boolean).join(", "), kind: "Nombre" });
+                if (idle) idle.refresh();
             }
             setTimeout(() => {
                 resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });

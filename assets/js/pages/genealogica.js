@@ -11,10 +11,24 @@
     const hint = document.getElementById("gnHint");
     const resultsSection = document.getElementById("resultsSection");
     const resultsContainer = document.getElementById("resultsContainer");
+    const idleSection = document.getElementById("idleSection");
 
     if (!form || !btn || !dniInput || !resultsSection || !resultsContainer) return;
 
     let lastResult = null;
+
+    /* --- v13: instrucciones + empty state + historial --- */
+    HISTORY_UI.mountTips("tipCard", [
+        "Ingrese los 8 dígitos del DNI, sin espacios.",
+        "El árbol genealógico puede tardar unos segundos.",
+        "Podrá descargar el resultado en PDF al finalizar."
+    ]);
+    const idle = idleSection ? HISTORY_UI.create(idleSection, {
+        page: "genealogica",
+        title: "Realiza una consulta",
+        subtitle: "Los resultados aparecerán aquí una vez completada la búsqueda.",
+        onPick: (it) => { dniInput.value = it.label; form.requestSubmit ? form.requestSubmit() : null; }
+    }) : null;
 
     /* Solo dígitos, máximo 8 */
     dniInput.addEventListener("input", () => {
@@ -30,6 +44,7 @@
     }
 
     function showSkeleton() {
+        if (idle) idle.hide();
         resultsSection.style.display = "block";
         resultsContainer.className = "results-grid";
         resultsContainer.innerHTML = `
@@ -138,6 +153,8 @@
             } else {
                 lastResult = { dni, texto: data.texto };
                 renderArbol(resultsContainer, lastResult);
+                HIST.push("genealogica", { label: dni, kind: "DNI" });
+                if (idle) idle.refresh();
                 wirePdf();
             }
             setTimeout(() => resultsSection.scrollIntoView({ behavior: "smooth", block: "start" }), 120);
