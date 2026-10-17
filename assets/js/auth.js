@@ -75,6 +75,9 @@ const AUTH = (() => {
                     const publicas = ["/login.html", "/register.html", "/forgot-password.html"];
                     if (!currentUser && publicas.indexOf(p) === -1) {
                         location.replace("/login.html");
+                    } else if (currentUser && publicas.indexOf(p) !== -1 && p !== "/forgot-password.html") {
+                        /* con sesion activa no debe quedarse en login/register: al panel */
+                        location.replace("/index.html");
                     }
                 } catch (e) {}
             });
