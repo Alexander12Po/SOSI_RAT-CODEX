@@ -9,8 +9,12 @@
 
     AUTH.onChange(u => { if (u) location.replace("/index.html"); });
 
-    document.querySelectorAll(".oauth-btn").forEach(b =>
-        b.addEventListener("click", () => AUTH.oauth(b.dataset.provider)));
+    document.querySelectorAll(".oauth-btn").forEach(b => {
+        b.addEventListener("click", () => {
+            AUTH.oauth(b.dataset.provider).catch(err => AUTH.toast(AUTH.traducirError(err), "error"));
+        });
+        b.disabled = false;
+    });
 
     document.querySelectorAll(".auth-eye").forEach(b => {
         b.addEventListener("click", () => {

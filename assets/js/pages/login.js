@@ -79,7 +79,9 @@
             /* persistencia: Firebase Auth guarda la sesión automáticamente.
                "Recordarme" se gestiona con el almacenamiento del SDK. */
             AUTH.toast("Sesión iniciada. Bienvenido.", "ok");
-            const nx = new URLSearchParams(location.search).get("next"); setTimeout(() => location.replace(nx && nx.startsWith("/") ? nx : "/"), 500);
+            /* navegacion la hace auth.js (onChange -> /index.html con sesion);
+               aqui solo espera para evitar doble competing navigation */
+            await new Promise(r => setTimeout(r, 800));
         } catch (err) {
             showErr(AUTH.traducirError(err));
             btn.disabled = false; btn.classList.remove("loading");
