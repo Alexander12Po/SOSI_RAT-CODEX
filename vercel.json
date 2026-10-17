@@ -2,59 +2,29 @@
   "cleanUrls": false,
   "trailingSlash": false,
   "rewrites": [
-    {
-      "source": "/^\\/$",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/consulta",
-      "destination": "/consulta.html"
-    },
-    {
-      "source": "/nombre",
-      "destination": "/nombre.html"
-    },
-    {
-      "source": "/genealogica",
-      "destination": "/genealogica.html"
-    },
-    {
-      "source": "/servicio",
-      "destination": "/servicio.html"
-    },
-    {
-      "source": "/login",
-      "destination": "/login.html"
-    },
-    {
-      "source": "/register",
-      "destination": "/register.html"
-    },
-    {
-      "source": "/forgot-password",
-      "destination": "/forgot-password.html"
-    },
-    {
-      "source": "/perfil",
-      "destination": "/perfil.html"
-    },
-    {
-      "source": "/configuracion",
-      "destination": "/configuracion.html"
-    }
+    { "source": "/^\\/$", "destination": "/index.html" },
+    { "source": "/consulta", "destination": "/consulta.html" },
+    { "source": "/nombre", "destination": "/nombre.html" },
+    { "source": "/genealogica", "destination": "/genealogica.html" },
+    { "source": "/servicio", "destination": "/servicio.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/register", "destination": "/register.html" },
+    { "source": "/forgot-password", "destination": "/forgot-password.html" },
+    { "source": "/perfil", "destination": "/perfil.html" },
+    { "source": "/configuracion", "destination": "/configuracion.html" }
   ],
   "headers": [
     {
       "source": "/assets/js/(config|env)\\.js",
       "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/javascript; charset=utf-8"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        }
+        { "key": "Content-Type", "value": "application/javascript; charset=utf-8" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    },
+    {
+      "source": "/(.*)\\.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
       ]
     }
   ]
