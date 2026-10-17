@@ -20,7 +20,7 @@
         return false;
     }
 
-    /* Si Supabase confirma sesion real, AUTH la gestiona; si al cargar
+    /* Si Firebase confirma sesion real, AUTH la gestiona; si al cargar
        sigue sin sesion local, redirigir al login. */
     document.addEventListener("DOMContentLoaded", function () {
         setTimeout(function () {

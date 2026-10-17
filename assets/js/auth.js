@@ -16,7 +16,7 @@ const AUTH = (() => {
         { id: "discord", nombre: "Discord" }
     ];
 
-    let app = null, auth = null, providerFactories = {};
+    let app = null, auth = null, db = null, providerFactories = {};
     let ready = false;
     let currentUser = null;      // { uid, email, displayName, photoURL, provider }
     const listeners = [];
@@ -43,10 +43,13 @@ const AUTH = (() => {
             return false;
         }
         try {
-            const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js");
-            const fbAuth = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js");
+            const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js");
+            const fbAuth = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js");
+            const fbStore = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js");
             app = initializeApp(cfg);
             auth = fbAuth.getAuth(app);
+            db = fbStore.getFirestore(app);
+            window.__FB_STORE_MODULE__ = fbStore;
             providerFactories = {
                 google: () => new fbAuth.GoogleAuthProvider(),
                 github: () => new fbAuth.GithubAuthProvider(),
@@ -82,11 +85,29 @@ const AUTH = (() => {
 
     /* ---------- API publica ---------- */
 
+    /* Crea el documento de perfil en Firestore (coleccion "perfiles", doc = UID).
+       Campos: es_admin:false, creditos:0, nombre_usuario, creado_en. */
+    async function crearPerfil(uid, nombreUsuario) {
+        try {
+            const fs = window.__FB_STORE_MODULE__;
+            if (!fs || !db) return;
+            await fs.setDoc(fs.doc(db, "perfiles", uid), {
+                es_admin: false,
+                creditos: 0,
+                nombre_usuario: nombreUsuario || "",
+                creado_en: new Date().toISOString()
+            });
+        } catch (err) {
+            console.warn("SOSI: no se pudo crear el perfil en Firestore:", err && err.message);
+        }
+    }
+
     async function signUp(email, password, displayName) {
         requireReady();
         const fb = window.__FB_AUTH_MODULE__;
         const cred = await fb.createUserWithEmailAndPassword(auth, email, password);
         if (displayName) await fb.updateProfile(cred.user, { displayName });
+        await crearPerfil(cred.user.uid, displayName);
         try { await fb.sendEmailVerification(cred.user); } catch (_) {}
         return mapUser(cred.user);
     }
@@ -104,7 +125,8 @@ const AUTH = (() => {
         const make = providerFactories[providerId];
         if (!make) throw new Error("Proveedor no soportado.");
         try {
-            await fb.signInWithPopup(auth, make());
+            const res = await fb.signInWithPopup(auth, make());
+            if (res && res.user) await crearPerfil(res.user.uid, res.user.displayName || res.user.email);
         } catch (err) {
             if (err && (err.code === "auth/popup-blocked" || err.code === "auth/operation-not-allowed")) {
                 await fb.signInWithRedirect(auth, make());

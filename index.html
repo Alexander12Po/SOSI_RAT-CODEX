@@ -58,11 +58,11 @@
     </div>
     <script>
     /* Redireccion directo al login si no hay sesion valida.
-       El gate visual solo dura un instante mientras se comprueba Supabase. */
+       El gate visual solo dura un instante mientras Firebase confirma la sesion. */
     (function () {
         try {
             var g = document.getElementById("authGate");
-            /* Clave de sesion del SDK de Supabase en localStorage */
+            /* Clave de sesion del SDK de Firebase Auth en localStorage */
             var keys = Object.keys(localStorage).filter(function (k) {
                 return k.indexOf("firebase-authentication") === 0 || (k.indexOf("firebase:") === 0 && k.indexOf(":credential") !== -1);
             });
@@ -183,14 +183,14 @@
         </footer>
     </main>
 
-    <script src="assets/js/config.js?v=20"></script>
-    <script src="assets/js/icons.js?v=20"></script>
-    <script src="assets/js/services.js?v=20"></script>
-    <script src="assets/js/loader.js?v=20"></script>
-    <script src="assets/js/firebase.js?v=20"></script>
-    <script src="assets/js/auth.js?v=20"></script>
-    <script src="assets/js/sidebar.js?v=20"></script>
-    <script src="assets/js/pages/home.js?v=20"></script>
-    <script src="assets/js/pages/gate.js?v=20"></script>
+    <script src="assets/js/config.js?v=21"></script>
+    <script src="assets/js/icons.js?v=21"></script>
+    <script src="assets/js/services.js?v=21"></script>
+    <script src="assets/js/loader.js?v=21"></script>
+    <script src="assets/js/firebase.js?v=21"></script>
+    <script src="assets/js/auth.js?v=21"></script>
+    <script src="assets/js/sidebar.js?v=21"></script>
+    <script src="assets/js/pages/home.js?v=21"></script>
+    <script src="assets/js/pages/gate.js?v=21"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-/* SOSI CODEX — forgot.js (recuperación real vía Supabase) */
+/* SOSI CODEX — forgot.js (recuperación real vía Firebase sendPasswordResetEmail) */
 (function () {
     const form = document.getElementById("forgotForm");
     const errBox = document.getElementById("forgotErr");

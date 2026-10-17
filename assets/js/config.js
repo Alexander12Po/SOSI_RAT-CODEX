@@ -4,8 +4,8 @@
    ============================================================ */
 
 const CONFIG = Object.freeze({
-    /* Supabase Auth — deja enabled:false hasta completar la configuración.
-       Pega tu URL y tu anon key reales cuando tengas tu proyecto de Supabase. */
+    /* Autenticación: Firebase Auth (ver assets/js/firebase.js).
+       Ya no se depende de SUPABASE_URL / SUPABASE_ANON_KEY. */
     FIREBASE: { projectId: "sosi-codex" },
     BACKEND_URL: "https://backend-dni.onrender.com",
     ENDPOINTS: {

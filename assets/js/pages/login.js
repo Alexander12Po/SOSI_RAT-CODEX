@@ -4,7 +4,7 @@
     const errBox = document.getElementById("loginErr");
     const btn = document.getElementById("loginBtn");
 
-    /* si ya hay sesión, ir al panel (evita bucles: solo cuando Supabase está listo) */
+    /* si ya hay sesión, ir al panel (evita bucles con Firebase) */
     let redirigido = false;
     AUTH.onChange(u => {
         if (u && !redirigido && !/reset=1/.test(location.search)) {
@@ -13,7 +13,7 @@
         }
     });
 
-    /* OAuth — flujo real vía Supabase (redirige al proveedor) */
+    /* OAuth — flujo real vía Firebase (redirige al proveedor) */
     document.querySelectorAll(".oauth-btn").forEach(b => {
         b.addEventListener("click", () => AUTH.oauth(b.dataset.provider));
         b.disabled = false;
