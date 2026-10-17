@@ -4,6 +4,14 @@
    ============================================================ */
 
 const CONFIG = Object.freeze({
+    /* Supabase Auth — deja enabled:false hasta completar la configuración.
+       Pega tu URL y tu anon key reales cuando tengas tu proyecto de Supabase. */
+    SUPABASE: {
+        enabled: false,                                  // ponlo en true al añadir url + anonKey
+        url: "",                                         // ej. "https://xyzsupabase.supabase.co"
+        anonKey: "",                                     // clave "anon" pública (SB_pub_...)
+        providers: ["google", "github", "discord"]       // proveedores habilitados en Supabase
+    },
     BACKEND_URL: "https://backend-dni.onrender.com",
     ENDPOINTS: {
         estado: "/estado",

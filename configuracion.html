@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configuración — SOSI CODEX</title>
+    <meta name="description" content="Ajustes de tu cuenta SOSI CODEX.">
+    <meta name="robots" content="noindex">
+    <link rel="icon" href="assets/img/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
+    <link rel="apple-touch-icon" href="assets/img/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/base.css?v=16">
+    <link rel="stylesheet" href="assets/css/layout.css?v=16">
+    <link rel="stylesheet" href="assets/css/auth.css?v=16">
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="/" class="sidebar-logo">
+      <span class="brand-mark">SC</span>
+      <span class="sidebar-brand">SOSI<small>Codex</small></span>
+    </a>
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Cerrar menu">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <nav class="sidebar-nav" id="sidebarNav"></nav>
+  <div class="sidebar-footer">
+    <div id="accountSidebar"></div>
+  </div>
+</aside>
+
+<main class="main-content">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="menu-btn" id="menuBtn" aria-label="Abrir menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <span class="topbar-title">Configuración</span>
+    </div>
+    <div class="topbar-right">
+      <span id="accountSlot"></span>
+    </div>
+  </header>
+
+  <div class="page-content">
+    <div class="panel-head">
+      <div class="ph-left">
+        <div class="ph-badge">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9 2 2 0 1 1-2.8 2.8 1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5 2 2 0 1 1-4 0 1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3 2 2 0 1 1-2.8-2.8 1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1 2 2 0 1 1 0-4 1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9 2 2 0 1 1 2.8-2.8 1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5 2 2 0 1 1 4 0 1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3 2 2 0 1 1 2.8 2.8 1.7 1.7 0 0 0-.3 1.9v.1a1.7 1.7 0 0 0 1.5 1 2 2 0 1 1 0 4 1.7 1.7 0 0 0-1.5 1z"/></svg>
+        </div>
+        <div>
+          <div class="ph-title">Configuración</div>
+          <div class="ph-sub">Seguridad de la cuenta</div>
+        </div>
+      </div>
+    </div>
+
+    <form class="auth-card" style="max-width:520px" id="pwForm" novalidate autocomplete="off">
+      <div class="auth-field">
+        <label class="auth-label" for="npass">Nueva contraseña</label>
+        <div class="auth-input-wrap">
+          <input class="auth-input has-toggle" type="password" id="npass" placeholder="Mínimo 8 caracteres" required>
+          <button type="button" class="auth-eye" data-target="npass" aria-label="Mostrar contraseña">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="auth-err" id="cfgErr" role="alert"></div>
+      <div class="auth-ok-msg" id="cfgOk" role="status"></div>
+      <button class="auth-btn auth-btn-primary" type="submit" id="cfgBtn">
+        <span class="auth-spin"></span>
+        <span class="auth-btn-label">Actualizar contraseña</span>
+      </button>
+      <p class="auth-foot" id="cfgGuest" style="display:none"></p>
+    </form>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/js/config.js?v=16"></script>
+<script src="assets/js/icons.js?v=16"></script>
+<script src="assets/js/services.js?v=16"></script>
+<script src="assets/js/auth.js?v=16"></script>
+<script src="assets/js/sidebar.js?v=16"></script>
+<script src="assets/js/pages/configuracion.js?v=16"></script>
+</body>
+</html>

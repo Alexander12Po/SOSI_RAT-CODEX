@@ -2,10 +2,45 @@
   "cleanUrls": false,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/^\\/$", "destination": "/index.html" },
-    { "source": "/consulta", "destination": "/consulta.html" },
-    { "source": "/nombre", "destination": "/nombre.html" },
-    { "source": "/genealogica", "destination": "/genealogica.html" },
-    { "source": "/servicio", "destination": "/servicio.html" }
+    {
+      "source": "/^\\/$",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/consulta",
+      "destination": "/consulta.html"
+    },
+    {
+      "source": "/nombre",
+      "destination": "/nombre.html"
+    },
+    {
+      "source": "/genealogica",
+      "destination": "/genealogica.html"
+    },
+    {
+      "source": "/servicio",
+      "destination": "/servicio.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/register",
+      "destination": "/register.html"
+    },
+    {
+      "source": "/forgot-password",
+      "destination": "/forgot-password.html"
+    },
+    {
+      "source": "/perfil",
+      "destination": "/perfil.html"
+    },
+    {
+      "source": "/configuracion",
+      "destination": "/configuracion.html"
+    }
   ]
 }

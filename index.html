@@ -25,10 +25,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/base.css?v=14">
-    <link rel="stylesheet" href="assets/css/layout.css?v=14">
-    <link rel="stylesheet" href="assets/css/loader.css?v=14">
-    <link rel="stylesheet" href="assets/css/home.css?v=14">
+    <link rel="stylesheet" href="assets/css/base.css?v=16">
+    <link rel="stylesheet" href="assets/css/layout.css?v=16">
+    <link rel="stylesheet" href="assets/css/loader.css?v=16">
+    <link rel="stylesheet" href="assets/css/home.css?v=16">
+    <link rel="stylesheet" href="assets/css/auth.css?v=16">
 </head>
 <body>
 
@@ -55,6 +56,7 @@
         </div>
         <nav class="sidebar-nav" id="sidebarNav"></nav>
         <div class="sidebar-footer">
+            <div id="accountSidebar"></div>
             <div class="security-badge">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
                 <span>Cifrado AES</span>
@@ -73,6 +75,7 @@
             </div>
             <div class="topbar-right">
                 <div class="status-indicator"><span class="status-dot"></span><span>En línea</span></div>
+                <span id="accountSlot"></span>
                 <a href="consulta.html?key=dni" class="user-avatar" aria-label="Consulta DNI">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 </a>
@@ -120,11 +123,13 @@
         </footer>
     </main>
 
-    <script src="assets/js/config.js?v=14"></script>
-    <script src="assets/js/icons.js?v=14"></script>
-    <script src="assets/js/services.js?v=14"></script>
-    <script src="assets/js/loader.js?v=14"></script>
-    <script src="assets/js/sidebar.js?v=14"></script>
-    <script src="assets/js/pages/home.js?v=14"></script>
+    <script src="assets/js/config.js?v=16"></script>
+    <script src="assets/js/icons.js?v=16"></script>
+    <script src="assets/js/services.js?v=16"></script>
+    <script src="assets/js/loader.js?v=16"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="assets/js/auth.js?v=16"></script>
+    <script src="assets/js/sidebar.js?v=16"></script>
+    <script src="assets/js/pages/home.js?v=16"></script>
 </body>
 </html>
