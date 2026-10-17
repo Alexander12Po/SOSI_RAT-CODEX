@@ -22,18 +22,27 @@ const AUTH = (() => {
     let authResuelto = false;    // true cuando Firebase ya dio su primera respuesta real
     const listeners = [];
 
-    /* Clave de sesion del SDK de Firebase Auth en localStorage (indicador
-       inmediato mientras Firebase termina de confirmar la sesion real). */
-    function hayPistaSesionLocal() {
+    /* Indicador inmediato de sesion mientras Firebase termina de confirmar
+       la sesion real. Lee la clave de sesion del SDK de Firebase Auth, que
+       puede estar en localStorage O sessionStorage segun el modo "Recordarme"
+       y la version del SDK. Se aceptan ambos formatos de token (JWT "eyJ..."
+       o API key "AIza..."): si el formato no coincide, simplemente se espera
+       a onAuthStateChanged (fuente de verdad) en lugar de redirigir. */
+    function leerPista(win) {
         try {
-            const keys = Object.keys(localStorage).filter(k =>
-                k.indexOf("firebase:") === 0 && k.indexOf(":credential") !== -1);
+            const keys = Object.keys(win.localStorage)
+                .concat(Object.keys(win.sessionStorage))
+                .filter(k => k.indexOf("firebase:") === 0 && k.indexOf(":credential") !== -1);
             for (let i = 0; i < keys.length; i++) {
-                const v = localStorage.getItem(keys[i]) || "";
-                if (/"accessToken"\s*:\s*"eyJ/.test(v)) return true;
+                let v = "";
+                try { v = win.localStorage.getItem(keys[i]) || win.sessionStorage.getItem(keys[i]) || ""; } catch (_) {}
+                if (/"accessToken"\s*:\s*"[A-Za-z0-9_\-]{20,}/.test(v)) return true;
             }
         } catch (_) {}
         return false;
+    }
+    function hayPistaSesionLocal() {
+        return leerPista(window);
     }
 
     function notify() { listeners.forEach(fn => { try { fn(currentUser); } catch (_) {} }); }
@@ -83,8 +92,9 @@ const AUTH = (() => {
            Solo en paginas protegidas (login/register/forgot son publicas). */
         try {
             const p = location.pathname.replace(/\/+$/, "") || "/";
-            const publicas = ["/", "/index.html", "/login.html", "/register.html", "/forgot-password.html"];
-            if (publicas.indexOf(p) === -1) {
+            const publicas = ["/login.html", "/register.html", "/forgot-password.html"];
+            const esPanel = (p === "/" || p === "/index.html");
+            if (publicas.indexOf(p) === -1 && !esPanel) {
                 mostrarSplash();
                 document.documentElement.classList.add("sesion-pendiente");
                 setTimeout(() => {
@@ -94,10 +104,11 @@ const AUTH = (() => {
                         ocultarSplash();
                     }
                 }, 6000);
-            } else if (p !== "/login.html" && p !== "/register.html" && p !== "/forgot-password.html") {
-                /* "/" o "/index.html": sin pista de sesion -> login de inmediato
-                   (el login es la PRIMERA pantalla obligatoria). Con pista, se
-                   muestra el panel y Firebase confirma en segundo plano. */
+            } else if (esPanel) {
+                /* "/": el login es la PRIMERA pantalla obligatoria. Solo se
+                   redirige de inmediato cuando NO hay ninguna pista de sesion;
+                   con pista, se muestra el panel y onAuthStateChanged confirma
+                   en segundo plano (unica fuente de verdad — nunca un rebote). */
                 if (!hayPistaSesionLocal()) location.replace("/login.html");
             }
         } catch (_) {}
@@ -127,18 +138,23 @@ const AUTH = (() => {
                 notify();
                 /* UNICA autoridad de navegacion (antes estaba duplicada en
                    gate.js, index.html inline y login.js — eso causaba el bucle).
-                   PUBLICAS: /, login, register, forgot-password. Protegidas: resto.
+                   PUBLICAS: login, register, forgot-password. Protegidas: resto.
                    Regla anti-bucle: NUNCA redirigir a una pagina que ya esta
                    cargando la propia URL destino. */
                 try {
                     const p = location.pathname.replace(/\/+$/, "") || "/";
-                    const publicas = ["/", "/index.html", "/login.html", "/register.html", "/forgot-password.html"];
+                    const publicas = ["/login.html", "/register.html", "/forgot-password.html"];
                     if (!currentUser && publicas.indexOf(p) === -1) {
-                        /* protegida sin sesion -> login (nunca si ya esta en login) */
+                        /* protegida sin sesion -> login (nunca si ya esta en login).
+                           Guarda la pagina destino para volver ahi tras el login. */
+                        try { sessionStorage.setItem("next", location.pathname + location.search); } catch (_) {}
                         location.replace("/login.html");
                     } else if (currentUser && (p === "/login.html" || p === "/register.html") && !/reset=1/.test(location.search)) {
-                        /* con sesion activa no debe quedarse en login/register: al panel */
-                        location.replace("/index.html");
+                        /* con sesion activa no debe quedarse en login/register: al panel
+                           (o a la pagina guardada antes del login, si existe) */
+                        let destino = "/index.html";
+                        try { destino = sessionStorage.getItem("next") || destino; sessionStorage.removeItem("next"); } catch (_) {}
+                        location.replace(destino);
                     }
                 } catch (e) {}
 

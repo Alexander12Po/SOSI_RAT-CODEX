@@ -4,12 +4,14 @@
     const errBox = document.getElementById("loginErr");
     const btn = document.getElementById("loginBtn");
 
-    /* si ya hay sesión, ir al panel (evita bucles con Firebase) */
+    /* si ya hay sesion, ir al panel (evita bucles con Firebase) */
     let redirigido = false;
     AUTH.onChange(u => {
         if (u && !redirigido && !/reset=1/.test(location.search)) {
             redirigido = true;
-            location.replace("/index.html");
+            const destino = sessionStorage.getItem("next") || "/index.html";
+            try { sessionStorage.removeItem("next"); } catch (_) {}
+            location.replace(destino);
         }
     });
 
