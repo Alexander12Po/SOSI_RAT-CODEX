@@ -74,12 +74,12 @@
             }
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr("Introduce un correo electrónico válido."); btn.disabled=false; btn.classList.remove("loading"); return; }
             await AUTH.signIn(email, password);
-            /* persistencia: supabase-js guarda la sesión automáticamente.
+            /* persistencia: Firebase Auth guarda la sesión automáticamente.
                "Recordarme" se gestiona con el almacenamiento del SDK. */
             AUTH.toast("Sesión iniciada. Bienvenido.", "ok");
             const nx = new URLSearchParams(location.search).get("next"); setTimeout(() => location.replace(nx && nx.startsWith("/") ? nx : "/"), 500);
         } catch (err) {
-            showErr(err.message || "No se pudo iniciar sesión.");
+            showErr(AUTH.traducirError(err));
             btn.disabled = false; btn.classList.remove("loading");
         }
     });

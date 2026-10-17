@@ -64,7 +64,7 @@
             form.querySelector('button[type="submit"]').disabled = false;
             btn.classList.remove("loading");
         } catch (err) {
-            showErr(err.message || "No se pudo crear la cuenta.");
+            showErr(AUTH.traducirError(err));
             btn.disabled = false; btn.classList.remove("loading");
         }
     });

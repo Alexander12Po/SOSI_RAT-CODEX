@@ -1,11 +1,12 @@
 /* ============================================================
-   SOSI CODEX — auth.js
-   Capa de autenticación con Supabase Auth (OAuth + correo).
-   - Reutiliza CONFIG.SUPABASE (URL + anon key pública).
-   - Sesión gestionada por supabase-js (persistencia segura:
-     localStorage con tokens JWT del propio SDK; refresh automático).
-   - Renderiza el widget de cuenta en topbar y sidebar.
-   - No bloquea páginas públicas: solo muestra estado de sesión.
+   SOSI CODEX — auth.js (Firebase Authentication)
+   - Registro / login / logout con correo y contrasena.
+   - Recuperacion de contrasena real (sendPasswordResetEmail).
+   - Persistencia segura: onAuthStateChanged + token ID fresco.
+   - OAuth Google/GitHub/Discord listos para habilitarse en
+     Firebase Console (proveedores); si faltan, avisa en espanol.
+   - Widget de cuenta en topbar/sidebar.
+   - La apiKey es publica por diseno; nunca secretos aqui.
    ============================================================ */
 
 const AUTH = (() => {
@@ -15,301 +16,240 @@ const AUTH = (() => {
         { id: "discord", nombre: "Discord" }
     ];
 
-    let client = null;          // instancia Supabase
-    let ready = false;          // cliente inicializado correctamente
-    let cfg = null;             // configuración (window.SOSI_SUPABASE)
-    let pendingOAuth = null;    // proveedor OAuth pendiente desde ?oauth=
-    const listeners = [];       // suscriptores de cambios de sesión
-    let currentUser = null;
+    let app = null, auth = null, providerFactories = {};
+    let ready = false;
+    let currentUser = null;      // { uid, email, displayName, photoURL, provider }
+    const listeners = [];
 
     function notify() { listeners.forEach(fn => { try { fn(currentUser); } catch (_) {} }); }
 
-    /* ---------- inicialización ---------- */
+    function mapUser(u) {
+        if (!u) return null;
+        const prov = (u.providerData && u.providerData[0] && u.providerData[0].providerId) || "password";
+        return {
+            uid: u.uid,
+            email: u.email || "",
+            displayName: u.displayName || (u.email ? u.email.split("@")[0] : "Usuario"),
+            photoURL: u.photoURL || "",
+            provider: prov,
+            emailVerified: !!u.emailVerified
+        };
+    }
+
     async function init() {
-        /* Fuente de verdad única: window.SOSI_SUPABASE (env.js), que lee
-           las variables de Vercel (SUPABASE_URL / SUPABASE_ANON_KEY).
-           Fallback a CONFIG.SUPABASE solo por compatibilidad. */
-        cfg = (typeof window !== "undefined" && window.SOSI_SUPABASE) ||
-              ((typeof CONFIG !== "undefined" && CONFIG.SUPABASE) ? CONFIG.SUPABASE : null);
-
-        /* Detectar proveedor desde el formulario (?oauth=github|google|discord) */
-        try {
-            const q = new URLSearchParams(location.search);
-            const prov = (q.get("oauth") || "").toLowerCase();
-            if (["google", "github", "discord"].includes(prov)) pendingOAuth = prov;
-        } catch (e) {}
-
-        if (!cfg || !cfg.enabled || !cfg.url || !cfg.anonKey || !window.supabase) {
-            /* Sin credenciales todavía: igualmente mostramos el widget (botón "Iniciar sesión") */
-            renderAccount();
+        const cfg = window.SOSI_FIREBASE;
+        if (!cfg || !cfg.apiKey || !cfg.projectId) {
+            console.warn("SOSI: falta assets/js/firebase.js");
             return false;
         }
         try {
-            client = window.supabase.createClient(cfg.url, cfg.anonKey, {
-                persistSession: true,
-                autoRefreshToken: true,
-                detectSessionInUrl: true
-            });
-            const { data } = await client.auth.getSession();
-            currentUser = data.session ? data.session.user : null;
-            client.auth.onAuthStateChange((_evt, session) => {
-                currentUser = session ? session.user : null;
+            const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js");
+            const fbAuth = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js");
+            app = initializeApp(cfg);
+            auth = fbAuth.getAuth(app);
+            providerFactories = {
+                google: () => new fbAuth.GoogleAuthProvider(),
+                github: () => new fbAuth.GithubAuthProvider(),
+                discord: () => new fbAuth.OAuthProvider("discord")
+            };
+            window.__FB_AUTH_MODULE__ = fbAuth;
+
+            await fbAuth.getRedirectResult(auth).then((res) => {
+                if (res && res.user) { /* sesion ya quedara via onAuthStateChanged */ }
+            }).catch(() => {});
+
+            fbAuth.onAuthStateChanged(auth, (u) => {
+                currentUser = mapUser(u);
                 renderAccount();
                 notify();
+                /* Gate: paginas protegidas sin sesion -> login */
+                try {
+                    const p = location.pathname.replace(/\/+$/, "");
+                    const publicas = ["/login", "/register", "/forgot-password", "", "/index"];
+                    if (!currentUser && publicas.indexOf(p) === -1) {
+                        location.replace("/login.html?next=" + encodeURIComponent(location.pathname));
+                    }
+                } catch (e) {}
             });
             ready = true;
             renderAccount();
-            /* Retorno OAuth: si la URL trae ?code=.../#access_token, Supabase
-               lo consume solo (detectSessionInUrl) y onAuthStateChange dispara.
-               Si además venimos con ?oauth=github y seguimos sin sesión,
-               reintentamos el flujo una sola vez (cubre cancelaciones). */
-            if (pendingOAuth && !currentUser) {
-                const p = pendingOAuth; pendingOAuth = null;
-                setTimeout(() => oauth(p), 400);
-            }
             return true;
-        } catch (e) {
-            console.warn("[auth] no disponible:", e && e.message);
+        } catch (err) {
+            console.error("SOSI: error inicializando Firebase", err);
             return false;
         }
     }
 
-    /* ---------- helpers de usuario ---------- */
-    function nombre(u) {
-        if (!u) return "";
-        const m = u.user_metadata || {};
-        return m.full_name || m.name || m.preferred_username || m.user_name ||
-               (u.email ? u.email.split("@")[0] : "Usuario");
+    /* ---------- API publica ---------- */
+
+    async function signUp(email, password, displayName) {
+        requireReady();
+        const fb = window.__FB_AUTH_MODULE__;
+        const cred = await fb.createUserWithEmailAndPassword(auth, email, password);
+        if (displayName) await fb.updateProfile(cred.user, { displayName });
+        try { await fb.sendEmailVerification(cred.user); } catch (_) {}
+        return mapUser(cred.user);
     }
+
+    async function signIn(email, password) {
+        requireReady();
+        const fb = window.__FB_AUTH_MODULE__;
+        const cred = await fb.signInWithEmailAndPassword(auth, email, password);
+        return mapUser(cred.user);
+    }
+
+    async function oauth(providerId) {
+        requireReady();
+        const fb = window.__FB_AUTH_MODULE__;
+        const make = providerFactories[providerId];
+        if (!make) throw new Error("Proveedor no soportado.");
+        try {
+            await fb.signInWithPopup(auth, make());
+        } catch (err) {
+            if (err && (err.code === "auth/popup-blocked" || err.code === "auth/operation-not-allowed")) {
+                await fb.signInWithRedirect(auth, make());
+            } else {
+                throw err;
+            }
+        }
+    }
+
+    async function resetPassword(email) {
+        requireReady();
+        const fb = window.__FB_AUTH_MODULE__;
+        await fb.sendPasswordResetEmail(auth, email, {
+            redirectTo: location.origin + "/login.html?reset=1"
+        });
+    }
+
+    async function updatePassword(newPassword) {
+        requireReady();
+        const fb = window.__FB_AUTH_MODULE__;
+        if (!auth.currentUser) throw new Error("Inicia sesion primero.");
+        await fb.updatePassword(auth.currentUser, newPassword);
+    }
+
+    async function signOut() {
+        requireReady();
+        const fb = window.__FB_AUTH_MODULE__;
+        await fb.signOut(auth);
+        location.href = "/login.html";
+    }
+
+    /* Token ID fresco para validar del lado del servidor (api/*.js) */
+    async function getIdToken() {
+        requireReady();
+        const fb = window.__FB_AUTH_MODULE__;
+        if (!auth.currentUser) return null;
+        return await auth.currentUser.getIdToken(false);
+    }
+
+    function traducirError(e) {
+        const c = (e && e.code) || "";
+        const mapa = {
+            "auth/invalid-email": "El correo electronico no es valido.",
+            "auth/user-not-found": "Correo o contrasena incorrectos.",
+            "auth/wrong-password": "Correo o contrasena incorrectos.",
+            "auth/invalid-credential": "Correo o contrasena incorrectos.",
+            "auth/email-already-in-use": "Ese correo ya esta registrado. Inicia sesion.",
+            "auth/weak-password": "La contrasena es muy debil (minimo 6 caracteres).",
+            "auth/too-many-requests": "Demasiados intentos. Espera un momento.",
+            "auth/network-request-failed": "Sin conexion con Firebase. Revisa tu internet.",
+            "auth/popup-closed-by-user": "Ventana de proveedor cerrada antes de terminar.",
+            "auth/unauthorized-domain": "Este dominio no esta autorizado en Firebase (Authentication -> Authorized domains).",
+            "auth/operation-not-allowed": "El proveedor aun esta deshabilitado en Firebase Console -> Authentication -> Sign-in method."
+        };
+        return mapa[c] || (e && e.message) || "No se pudo completar la operacion.";
+    }
+
+    function requireReady() {
+        if (!ready || !auth) throw new Error("Firebase no esta disponible. Revisa tu conexion o recarga la pagina.");
+    }
+
+    function user() { return currentUser; }
+    function isConfigured() { return ready; }
+    function onChange(fn) { listeners.push(fn); fn(currentUser); }
+
+    /* ---------- widget de cuenta ---------- */
+
+    function nombre(u) { return u ? (u.displayName || u.email || "Usuario") : "Usuario"; }
     function iniciales(u) {
         const n = nombre(u);
         return n.slice(0, 2).toUpperCase();
     }
     function avatarHtml(u, size) {
-        size = size || 30;
-        const m = (u && u.user_metadata) || {};
-        const url = m.avatar_url || m.picture || m.avatar_url;
-        if (url) {
-            return `<img class="acct-avatar" src="${url}" alt="" referrerpolicy="no-referrer" style="width:${size}px;height:${size}px">`;
+        size = size || 34;
+        if (u && u.photoURL) {
+            return '<img src="' + esc(u.photoURL) + '" alt="" style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;object-fit:cover">';
         }
-        return `<span class="acct-avatar acct-avatar-txt" style="width:${size}px;height:${size}px">${iniciales(u)}</span>`;
+        return '<span class="acc-avatar" style="width:' + size + 'px;height:' + size + 'px">' + esc(iniciales(u)) + '</span>';
     }
 
-    /* ---------- OAuth ---------- */
-    function urlRetorno() {
-        /* URL de retorno autorizada en Supabase (dominio de producción). */
-        return (window.SOSI_SUPABASE && window.SOSI_SUPABASE.redirectTo) ||
-               (location.origin + "/login.html");
-    }
-    async function oauth(providerId) {
-        if (!cfg || !cfg.url || !cfg.anonKey) {
-            toast("Faltan las credenciales de Supabase. Configura SUPABASE_URL y SUPABASE_ANON_KEY en Vercel.", "error");
-            return;
-        }
-        if (!ready) {
-            toast("El servicio de autenticación no está disponible. Revisa la URL del proyecto de Supabase.", "error");
-            return;
-        }
-        try {
-            const { data, error } = await client.auth.signInWithOAuth({
-                provider: providerId,
-                options: { redirectTo: urlRetorno(), skipBrowserRedirect: false }
-            });
-            if (error) {
-                const m = (error.message || "").toLowerCase();
-                if (m.includes("not found") || m.includes("invalid provider")) {
-                    toast(`"${providerId}" no está habilitado en Supabase → Authentication → Third-party providers.`, "error");
-                } else {
-                    toast(traducirError(error), "error");
-                }
-                return;
-            }
-            /* Si por cualquier motivo el SDK no redirigiera solo, usamos data.url */
-            if (data && data.url) { location.assign(data.url); }
-        } catch (e) {
-            toast("Error al iniciar sesión con el proveedor.", "error");
-        }
-    }
-
-    /* ---------- correo / contraseña ---------- */
-    async function signUp(email, password, displayName) {
-        requireReady();
-        const { error } = await client.auth.signUp({
-            email, password,
-            options: { data: { full_name: displayName }, emailRedirectTo: location.origin + "/login" }
-        });
-        if (error) throw new Error(traducirError(error));
-    }
-    async function signIn(email, password) {
-        requireReady();
-        const { error } = await client.auth.signInWithPassword({ email, password });
-        if (error) throw new Error(traducirError(error));
-    }
-    async function resetPassword(email) {
-        requireReady();
-        const { error } = await client.auth.resetPasswordForEmail(email, {
-            redirectTo: location.origin + "/login?reset=1"
-        });
-        if (error) throw new Error(traducirError(error));
-    }
-    async function updatePassword(newPassword) {
-        requireReady();
-        const { error } = await client.auth.updateUser({ password: newPassword });
-        if (error) throw new Error(traducirError(error));
-    }
-    async function signOut() {
-        if (!ready) return;
-        await client.auth.signOut();
-        currentUser = null;
-        renderAccount();
-        notify();
-    }
-
-    function traducirError(e) {
-        const m = (e.message || "").toLowerCase();
-        if (m.includes("invalid login")) return "Correo o contraseña incorrectos.";
-        if (m.includes("already registered") || m.includes("already exists")) return "Ese correo ya está registrado.";
-        if (m.includes("rate limit") || m.includes("too many")) return "Demasiados intentos. Espera un momento.";
-        if (m.includes("confirm")) return "Revisa tu correo para confirmar la cuenta antes de iniciar sesión.";
-        if (m.includes("password")) return "La contraseña no cumple los requisitos mínimos.";
-        return e.message || "Ocurrió un error inesperado.";
-    }
-    function requireReady() {
-        if (!ready) throw new Error("La autenticación no está configurada. Añade SUPABASE_URL y SUPABASE_ANON_KEY en Vercel (Project Settings → Environment Variables).");
-    }
-
-    /* ---------- OAuth: retorno del proveedor (?code=... o #access_token=...) ---------- */
-    async function consumeUrlSession() {
-        if (!ready || !client) return false;
-        const qs = new URLSearchParams(location.search);
-        if (!qs.has("code") && !(location.hash || "").includes("access_token")) return false;
-        try {
-            const { data, error } = await client.session.fromUrl(window.location.href);
-            if (error || !data || !data.session) throw error || new Error("sin sesión");
-            currentUser = data.session.user;
-            renderAccount(); notify();
-            history.replaceState({}, "", location.pathname); /* limpia la URL */
-            return true;
-        } catch (e) {
-            toast("No se pudo completar el inicio de sesión con el proveedor.", "error");
-            history.replaceState({}, "", location.pathname);
-            return false;
-        }
-    }
-
-    /* ---------- estado ---------- */
-    function user() { return currentUser; }
-    function isConfigured() { return ready; }
-    function onChange(fn) { listeners.push(fn); fn(currentUser); }
-
-    /* ---------- widget de cuenta (topbar + sidebar) ---------- */
     function renderAccount() {
-        const slotTop = document.getElementById("accountSlot");
-        const slotSide = document.getElementById("accountSidebar");
-        if (slotTop) slotTop.innerHTML = accountTopbarHtml();
-        if (slotSide) slotSide.innerHTML = accountSidebarHtml();
+        const slot = document.getElementById("accountSlot");
+        if (!slot) return;
+        const u = currentUser;
+        if (!u) {
+            slot.innerHTML = '<a class="btn btn-primary btn-sm" href="/login.html">Iniciar sesión</a>';
+            return;
+        }
+        slot.innerHTML = accountTopbarHtml(u);
         bindAccountEvents();
     }
 
-    function accountTopbarHtml() {
-        if (currentUser) {
-            return `
-            <div class="acct-wrap">
-                <button class="acct-btn" id="acctBtn" aria-label="Menú de cuenta" aria-haspopup="true">
-                    ${avatarHtml(currentUser, 28)}
-                    <span class="acct-name">${esc(nombre(currentUser))}</span>
-                </button>
-                <div class="acct-menu" id="acctMenu" role="menu">
-                    <div class="acct-menu-head">
-                        ${avatarHtml(currentUser, 34)}
-                        <div>
-                            <div class="acct-menu-name">${esc(nombre(currentUser))}</div>
-                            <div class="acct-menu-mail">${esc(currentUser.email || "")}</div>
-                        </div>
-                    </div>
-                    <a href="/perfil.html" class="acct-item" role="menuitem">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
-                        Mi perfil
-                    </a>
-                    <a href="/configuracion.html" class="acct-item" role="menuitem">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
-                        Configuración
-                    </a>
-                    <button class="acct-item acct-logout" id="acctLogout" type="button">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                        Cerrar sesión
-                    </button>
-                </div>
-            </div>`;
-        }
-        return `<a href="/login.html" class="btn-login" id="btnLoginTop">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-            Iniciar sesión
-        </a>`;
+    function accountTopbarHtml(u) {
+        return '' +
+            '<div class="acc-wrap">' +
+              '<button class="acc-btn" id="accBtn" aria-haspopup="true" aria-expanded="false">' +
+                avatarHtml(u, 30) +
+                '<span class="acc-name">' + esc(nombre(u)) + '</span>' +
+              '</button>' +
+              '<div class="acc-menu" id="accMenu" hidden>' +
+                '<a href="/perfil.html">👤 Mi perfil</a>' +
+                '<a href="/configuracion.html">⚙️ Configuración</a>' +
+                '<button type="button" id="accLogout">🚪 Cerrar sesión</button>' +
+              '</div>' +
+            '</div>';
     }
 
-    function accountSidebarHtml() {
-        if (currentUser) {
-            return `
-            <div class="side-acct">
-                ${avatarHtml(currentUser, 34)}
-                <div class="side-acct-info">
-                    <div class="side-acct-name">${esc(nombre(currentUser))}</div>
-                    <div class="side-acct-mail">${esc(currentUser.email || "")}</div>
-                </div>
-                <button class="side-acct-out" id="sideAcctLogout" aria-label="Cerrar sesión" title="Cerrar sesión">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                </button>
-            </div>`;
-        }
-        return `
-        <div class="side-acct side-acct-guest">
-            <div class="side-acct-info">
-                <div class="side-acct-name">Sin sesión</div>
-                <div class="side-acct-mail">Inicia sesión para tu perfil</div>
-            </div>
-            <a href="/login.html" class="side-acct-btn">Entrar</a>
-        </div>`;
+    function accountSidebarHtml(u) {
+        return '<div class="side-account">' + avatarHtml(u, 38) +
+            '<div><strong>' + esc(nombre(u)) + '</strong><small>' + esc(u.email || "") + '</small></div></div>';
     }
 
     function bindAccountEvents() {
-        const btn = document.getElementById("acctBtn");
-        const menu = document.getElementById("acctMenu");
-        if (btn && menu) {
-            btn.addEventListener("click", (e) => { e.stopPropagation(); menu.classList.toggle("open"); });
-            document.addEventListener("click", () => menu.classList.remove("open"));
-            document.addEventListener("keydown", (e) => { if (e.key === "Escape") menu.classList.remove("open"); });
-        }
-        const out1 = document.getElementById("acctLogout");
-        const out2 = document.getElementById("sideAcctLogout");
-        [out1, out2].forEach(el => el && el.addEventListener("click", async () => {
-            await signOut();
-            toast("Sesión cerrada.", "ok");
-        }));
+        const btn = document.getElementById("accBtn");
+        const menu = document.getElementById("accMenu");
+        if (!btn || !menu || btn.dataset.bound) return;
+        btn.dataset.bound = "1";
+        btn.addEventListener("click", (ev) => {
+            ev.stopPropagation();
+            menu.hidden = !menu.hidden;
+            btn.setAttribute("aria-expanded", String(!menu.hidden));
+        });
+        document.addEventListener("click", () => { menu.hidden = true; });
+        const lo = document.getElementById("accLogout");
+        if (lo) lo.addEventListener("click", () => { signOut().catch(err => toast(traducirError(err), "error")); });
     }
 
-    /* ---------- UI compartida ---------- */
     function esc(s) {
         return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
     }
+
     function toast(msg, tipo) {
-        let t = document.querySelector(".auth-toast");
-        if (!t) { t = document.createElement("div"); t.className = "auth-toast"; document.body.appendChild(t); }
+        let t = document.createElement("div");
+        t.className = "sosi-toast sosi-toast-" + (tipo || "ok");
         t.textContent = msg;
-        t.className = "auth-toast show " + (tipo || "");
-        clearTimeout(t._h);
-        t._h = setTimeout(() => t.classList.remove("show"), 2600);
+        document.body.appendChild(t);
+        setTimeout(() => t.classList.add("show"), 10);
+        setTimeout(() => { t.classList.remove("show"); setTimeout(() => t.remove(), 300); }, 2600);
     }
 
     return {
-        init, oauth, signUp, signIn, resetPassword, updatePassword, signOut,
-        user, isConfigured, onChange, providers: PROVIDERS, consumeUrlSession,
-        nombre, avatarHtml, esc, toast
+        init, signUp, signIn, oauth, resetPassword, updatePassword, signOut,
+        getIdToken, user, isConfigured, onChange,
+        nombre, avatarHtml, accountSidebarHtml, toast, traducirError, esc
     };
 })();
 
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => AUTH.init());
-} else {
-    AUTH.init();
-}
+document.addEventListener("DOMContentLoaded", () => { AUTH.init(); });

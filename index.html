@@ -27,11 +27,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/base.css?v=19">
-    <link rel="stylesheet" href="assets/css/layout.css?v=19">
-    <link rel="stylesheet" href="assets/css/loader.css?v=19">
-    <link rel="stylesheet" href="assets/css/home.css?v=19">
-    <link rel="stylesheet" href="assets/css/auth.css?v=19">
+    <link rel="stylesheet" href="assets/css/base.css?v=20">
+    <link rel="stylesheet" href="assets/css/layout.css?v=20">
+    <link rel="stylesheet" href="assets/css/loader.css?v=20">
+    <link rel="stylesheet" href="assets/css/home.css?v=20">
+    <link rel="stylesheet" href="assets/css/auth.css?v=20">
 </head>
 <body>
 
@@ -64,7 +64,7 @@
             var g = document.getElementById("authGate");
             /* Clave de sesion del SDK de Supabase en localStorage */
             var keys = Object.keys(localStorage).filter(function (k) {
-                return k.indexOf("sb-") === 0 && k.indexOf("-auth-token") !== -1;
+                return k.indexOf("firebase-authentication") === 0 || (k.indexOf("firebase:") === 0 && k.indexOf(":credential") !== -1);
             });
             var conSesion = false;
             for (var i = 0; i < keys.length; i++) {
@@ -183,15 +183,14 @@
         </footer>
     </main>
 
-    <script src="assets/js/config.js?v=19"></script>
-<script src="assets/js/env.js?v=19"></script>
-    <script src="assets/js/icons.js?v=19"></script>
-    <script src="assets/js/services.js?v=19"></script>
-    <script src="assets/js/loader.js?v=19"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="assets/js/auth.js?v=19"></script>
-    <script src="assets/js/sidebar.js?v=19"></script>
-    <script src="assets/js/pages/home.js?v=19"></script>
-    <script src="assets/js/pages/gate.js?v=19"></script>
+    <script src="assets/js/config.js?v=20"></script>
+    <script src="assets/js/icons.js?v=20"></script>
+    <script src="assets/js/services.js?v=20"></script>
+    <script src="assets/js/loader.js?v=20"></script>
+    <script src="assets/js/firebase.js?v=20"></script>
+    <script src="assets/js/auth.js?v=20"></script>
+    <script src="assets/js/sidebar.js?v=20"></script>
+    <script src="assets/js/pages/home.js?v=20"></script>
+    <script src="assets/js/pages/gate.js?v=20"></script>
 </body>
 </html>

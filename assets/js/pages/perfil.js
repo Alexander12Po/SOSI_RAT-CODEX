@@ -21,7 +21,7 @@
             <div class="kv-row"><span class="kv-k">Proveedor</span><span class="kv-v">${AUTH.esc(prov)}</span></div>
             <div class="kv-row"><span class="kv-k">Correo verificado</span><span class="kv-v">${u.email_confirmed_at ? "Sí" : "Pendiente"}</span></div>
             <div class="kv-row"><span class="kv-k">Miembro desde</span><span class="kv-v">${created}</span></div>
-            <div class="kv-row"><span class="kv-k">ID de usuario</span><span class="kv-v" style="font-family:var(--font-mono);font-size:11px">${AUTH.esc((u.id || "").slice(0, 8))}…</span></div>`;
+            <div class="kv-row"><span class="kv-k">ID de usuario</span><span class="kv-v" style="font-family:var(--font-mono);font-size:11px">${AUTH.esc((u.uid || "").slice(0, 8))}…</span></div>`;
     }
 
     AUTH.onChange(render);

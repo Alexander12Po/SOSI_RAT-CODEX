@@ -10,7 +10,7 @@
     function tieneSesion() {
         try {
             var keys = Object.keys(localStorage).filter(function (k) {
-                return k.indexOf("sb-") === 0 && k.indexOf("-auth-token") !== -1;
+                return k.indexOf("firebase-authentication") === 0 || (k.indexOf("firebase:") === 0 && k.indexOf(":credential") !== -1);
             });
             for (var i = 0; i < keys.length; i++) {
                 var v = localStorage.getItem(keys[i]) || "";

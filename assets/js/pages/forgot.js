@@ -15,7 +15,7 @@
             if (np && np.length >= 8) {
                 AUTH.updatePassword(np)
                     .then(() => { AUTH.toast("Contraseña actualizada.", "ok"); setTimeout(() => location.replace("/"), 800); })
-                    .catch(e => AUTH.toast(e.message, "error"));
+                    .catch(e => AUTH.toast(AUTH.traducirError(e), "error"));
             }
         });
     }

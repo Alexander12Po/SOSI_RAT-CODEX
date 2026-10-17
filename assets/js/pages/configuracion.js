@@ -34,7 +34,7 @@
             okBox.classList.add("show");
             document.getElementById("npass").value = "";
         } catch (err) {
-            errBox.textContent = err.message || "No se pudo actualizar la contraseña.";
+            errBox.textContent = AUTH.traducirError(err) || "No se pudo actualizar la contraseña.";
             errBox.classList.add("show");
         } finally {
             btn.disabled = false; btn.classList.remove("loading");
