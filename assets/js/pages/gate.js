@@ -1,34 +1,23 @@
 /* Gate de acceso OBLIGATORIO: sin sesion valida -> login.html directo.
-   El script inline de index.html ya redirige; aqui solo se asegura en
-   paginas internas (consulta/nombre/genealogica/servicio/perfil). */
+   Usa la confirmacion real de Firebase (AUTH.onChange), sin adivinar
+   claves de localStorage ni usar un tiempo de espera fijo. */
 (function () {
     var RUTA_LOGIN = "/login.html";
     var pagina = location.pathname.replace(/\/+$/, "");
     var publicas = ["/login.html", "/register.html", "/forgot-password.html", "", "/", "/index.html", "/index"];
     if (publicas.indexOf(pagina) !== -1) return;
 
-    function tieneSesion() {
-        try {
-            var keys = Object.keys(localStorage).filter(function (k) {
-                return k.indexOf("firebase-authentication") === 0 || (k.indexOf("firebase:") === 0 && k.indexOf(":credential") !== -1);
-            });
-            for (var i = 0; i < keys.length; i++) {
-                var v = localStorage.getItem(keys[i]) || "";
-                if (/"access_token"\s*:\s*"eyJ/.test(v)) return true;
-            }
-        } catch (e) {}
-        return false;
-    }
-
-    /* Si Firebase confirma sesion real, AUTH la gestiona; si al cargar
-       sigue sin sesion local, redirigir al login. */
-    document.addEventListener("DOMContentLoaded", function () {
-        setTimeout(function () {
-            if (!tieneSesion()) {
-                var u = null;
-                try { u = (window.AUTH && AUTH.user) ? AUTH.user() : null; } catch (e) {}
+    var decidido = false;
+    function esperarAuth() {
+        if (window.AUTH && typeof AUTH.onChange === "function") {
+            AUTH.onChange(function (u) {
+                if (decidido) return;
+                decidido = true;
                 if (!u) location.replace(RUTA_LOGIN + "?next=" + encodeURIComponent(location.pathname));
-            }
-        }, 900);
-    });
+            });
+        } else {
+            setTimeout(esperarAuth, 100);
+        }
+    }
+    document.addEventListener("DOMContentLoaded", esperarAuth);
 })();
