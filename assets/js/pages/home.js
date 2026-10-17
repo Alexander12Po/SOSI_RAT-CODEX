@@ -83,5 +83,11 @@
         });
     }
 
+    /* ---- perfil de usuario: nombre real si hay sesión (placeholder "Usuario" en caso contrario) ---- */
+    const nameEl = document.getElementById("profileName");
+    if (nameEl && typeof AUTH !== "undefined" && AUTH.onChange) {
+        AUTH.onChange(u => { nameEl.textContent = u ? AUTH.nombre(u) : "Usuario"; });
+    }
+
     render();
 })();

@@ -244,3 +244,97 @@
 @media (min-width: 961px) {
     .services-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
 }
+
+/* ============ PERFIL DE USUARIO (arriba del panel) ============ */
+.profile-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 3px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg, 12px);
+    padding: 16px 12px 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+.profile-avatar {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: var(--blue-bright);
+    background: var(--surface);
+    border: 2px solid var(--blue);
+    box-shadow: 0 0 18px var(--blue-glow);
+    margin-bottom: 6px;
+}
+.profile-avatar svg { width: 34px; height: 34px; }
+.profile-name {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-hi);
+}
+.profile-line {
+    font-size: var(--fs-xs);
+    color: var(--text-md);
+}
+.plan-premium {
+    color: var(--gold);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+/* ============ TOPBAR: créditos + notificaciones ============ */
+.credits-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 9px;
+    border-radius: 99px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--blue-bright);
+    font-size: var(--fs-xs);
+    white-space: nowrap;
+}
+.credits-num {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--text-hi);
+}
+.notif-btn {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-md);
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+}
+.notif-btn:hover { color: var(--blue-bright); border-color: var(--blue); }
+.notif-badge {
+    position: absolute;
+    top: -4px; right: -4px;
+    min-width: 14px; height: 14px;
+    padding: 0 3px;
+    border-radius: 99px;
+    background: var(--blue);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 14px;
+    text-align: center;
+    box-shadow: 0 0 8px var(--blue-glow);
+}
+@media (max-width: 400px) {
+    .credits-chip { padding: 5px 7px; }
+    .status-indicator { display: none; }
+}
