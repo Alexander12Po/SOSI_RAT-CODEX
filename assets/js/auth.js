@@ -67,12 +67,14 @@ const AUTH = (() => {
                 currentUser = mapUser(u);
                 renderAccount();
                 notify();
-                /* Gate: paginas protegidas sin sesion -> login */
+                /* Gate: paginas protegidas sin sesion -> login.
+                   Las unicas PUBLICAS son login, register y forgot-password.
+                   index/panel es PROTEGIDO: sin sesion tambien redirige a login. */
                 try {
                     const p = location.pathname.replace(/\/+$/, "");
-                    const publicas = ["/login.html", "/register.html", "/forgot-password.html", "", "/", "/index.html", "/index"];
+                    const publicas = ["/login.html", "/register.html", "/forgot-password.html"];
                     if (!currentUser && publicas.indexOf(p) === -1) {
-                        location.replace("/login.html?next=" + encodeURIComponent(location.pathname));
+                        location.replace("/login.html");
                     }
                 } catch (e) {}
             });
