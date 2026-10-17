@@ -122,3 +122,11 @@ input { font-family: inherit; }
     0%, 100% { opacity: 1; }
     50% { opacity: 0.35; }
 }
+
+/* Splash de sesion y bloqueo de contenido mientras Firebase confirma */
+html.sesion-pendiente body > *:not(#sesionSplash) { visibility: hidden !important; }
+#sesionSplash .splash-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #3B82F6; display: inline-block;
+    animation: blinkDot 1s infinite;
+}

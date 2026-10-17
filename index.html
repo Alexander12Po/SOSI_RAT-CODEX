@@ -46,36 +46,21 @@
     </div>
 
 
-    <!-- GATE DE ACCESO: el login se muestra primero (obligatorio) -->
-    <div class="auth-gate" id="authGate" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#0B1120;">
-        <div class="auth-gate-card">
-            <img src="assets/img/favicon.png" alt="SOSI CODEX" class="auth-gate-logo">
-            <h2>SOSI CODEX</h2>
-            <p>Inicia sesión para acceder al panel de servicios.</p>
-            <a class="btn btn-primary auth-gate-btn" href="login.html">Iniciar sesión</a>
-            <a class="auth-gate-skip" href="register.html">¿No tienes cuenta? Regístrate</a>
-        </div>
-    </div>
+    <!-- GATE DE ACCESO: el login es la PRIMERA pantalla (obligatorio).
+         Sin sesion -> redirige directo a login.html, sin tarjeta intermedia.
+         Con sesion -> se muestra el panel directamente. -->
     <script>
-    /* Redireccion directo al login si no hay sesion valida.
-       El gate visual solo dura un instante mientras Firebase confirma la sesion. */
     (function () {
         try {
-            var g = document.getElementById("authGate");
-            /* Clave de sesion del SDK de Firebase Auth en localStorage */
             var keys = Object.keys(localStorage).filter(function (k) {
-                return k.indexOf("firebase-authentication") === 0 || (k.indexOf("firebase:") === 0 && k.indexOf(":credential") !== -1);
+                return k.indexOf("firebase:") === 0 && k.indexOf(":credential") !== -1;
             });
             var conSesion = false;
             for (var i = 0; i < keys.length; i++) {
                 var v = localStorage.getItem(keys[i]) || "";
-                if (/"access_token"\s*:\s*"eyJ/.test(v)) { conSesion = true; break; }
+                if (/"accessToken"\s*:\s*"eyJ/.test(v)) { conSesion = true; break; }
             }
-            if (conSesion) {
-                g.remove(); /* ya inicio sesion: mostrar el panel directamente */
-            } else {
-                location.replace("login.html"); /* sin sesion: AL LOGIN, sin paso intermedio */
-            }
+            if (!conSesion) location.replace("login.html");
         } catch (e) { location.replace("login.html"); }
     })();
     </script>
@@ -188,7 +173,7 @@
     <script src="assets/js/services.js?v=21"></script>
     <script src="assets/js/loader.js?v=21"></script>
     <script src="assets/js/firebase.js?v=21"></script>
-    <script src="assets/js/auth.js?v=27"></script>
+    <script src="assets/js/auth.js?v=28"></script>
     <script src="assets/js/sidebar.js?v=21"></script>
     <script src="assets/js/pages/home.js?v=21"></script>
 </body>

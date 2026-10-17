@@ -22,6 +22,20 @@ const AUTH = (() => {
     let authResuelto = false;    // true cuando Firebase ya dio su primera respuesta real
     const listeners = [];
 
+    /* Clave de sesion del SDK de Firebase Auth en localStorage (indicador
+       inmediato mientras Firebase termina de confirmar la sesion real). */
+    function hayPistaSesionLocal() {
+        try {
+            const keys = Object.keys(localStorage).filter(k =>
+                k.indexOf("firebase:") === 0 && k.indexOf(":credential") !== -1);
+            for (let i = 0; i < keys.length; i++) {
+                const v = localStorage.getItem(keys[i]) || "";
+                if (/"accessToken"\s*:\s*"eyJ/.test(v)) return true;
+            }
+        } catch (_) {}
+        return false;
+    }
+
     function notify() { listeners.forEach(fn => { try { fn(currentUser); } catch (_) {} }); }
 
     function mapUser(u) {
@@ -37,12 +51,56 @@ const AUTH = (() => {
         };
     }
 
+    /* ---------- Splash de sesion (anti-bucle / anti parpadeo) ----------
+       Muestra un splash neutro mientras Firebase confirma la sesion, y solo
+       entonces muestra el contenido o redirige al login. Evita que el
+       visitante vea "un rectangulito/logotipo" o contenido a medias. */
+    function mostrarSplash() {
+        if (document.getElementById("sesionSplash")) return;
+        const s = document.createElement("div");
+        s.id = "sesionSplash";
+        s.setAttribute("style", "position:fixed;inset:0;z-index:9998;display:flex;" +
+            "align-items:center;justify-content:center;background:#0B1120;color:#A7B2C7;" +
+            "font-family:'Inter',system-ui,sans-serif;gap:10px;font-size:14px;transition:opacity .25s");
+        s.innerHTML = '<span class="splash-dot"></span> Verificando sesi\u00f3n\u2026';
+        document.body.appendChild(s);
+    }
+    function ocultarSplash() {
+        const s = document.getElementById("sesionSplash");
+        if (!s) return;
+        s.style.opacity = "0";
+        setTimeout(() => s.remove(), 260);
+    }
+
     async function init() {
         const cfg = window.SOSI_FIREBASE;
         if (!cfg || !cfg.apiKey || !cfg.projectId) {
             console.warn("SOSI: falta assets/js/firebase.js");
             return false;
         }
+
+        /* Splash + proteccion del contenido ANTES de que Firebase responda.
+           Solo en paginas protegidas (login/register/forgot son publicas). */
+        try {
+            const p = location.pathname.replace(/\/+$/, "") || "/";
+            const publicas = ["/", "/index.html", "/login.html", "/register.html", "/forgot-password.html"];
+            if (publicas.indexOf(p) === -1) {
+                mostrarSplash();
+                document.documentElement.classList.add("sesion-pendiente");
+                setTimeout(() => {
+                    /* si Firebase tarda demasiado, no dejar al usuario atrapado */
+                    if (!authResuelto && hayPistaSesionLocal()) {
+                        document.documentElement.classList.remove("sesion-pendiente");
+                        ocultarSplash();
+                    }
+                }, 6000);
+            } else if (p !== "/login.html" && p !== "/register.html" && p !== "/forgot-password.html") {
+                /* "/" o "/index.html": sin pista de sesion -> login de inmediato
+                   (el login es la PRIMERA pantalla obligatoria). Con pista, se
+                   muestra el panel y Firebase confirma en segundo plano. */
+                if (!hayPistaSesionLocal()) location.replace("/login.html");
+            }
+        } catch (_) {}
         try {
             const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js");
             const fbAuth = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js");
@@ -67,19 +125,26 @@ const AUTH = (() => {
                 currentUser = mapUser(u);
                 renderAccount();
                 notify();
-                /* Gate: paginas protegidas sin sesion -> login.
-                   Las unicas PUBLICAS son login, register y forgot-password.
-                   index/panel es PROTEGIDO: sin sesion tambien redirige a login. */
+                /* UNICA autoridad de navegacion (antes estaba duplicada en
+                   gate.js, index.html inline y login.js — eso causaba el bucle).
+                   PUBLICAS: /, login, register, forgot-password. Protegidas: resto.
+                   Regla anti-bucle: NUNCA redirigir a una pagina que ya esta
+                   cargando la propia URL destino. */
                 try {
-                    const p = location.pathname.replace(/\/+$/, "");
-                    const publicas = ["/login.html", "/register.html", "/forgot-password.html"];
+                    const p = location.pathname.replace(/\/+$/, "") || "/";
+                    const publicas = ["/", "/index.html", "/login.html", "/register.html", "/forgot-password.html"];
                     if (!currentUser && publicas.indexOf(p) === -1) {
+                        /* protegida sin sesion -> login (nunca si ya esta en login) */
                         location.replace("/login.html");
-                    } else if (currentUser && publicas.indexOf(p) !== -1 && p !== "/forgot-password.html") {
+                    } else if (currentUser && (p === "/login.html" || p === "/register.html") && !/reset=1/.test(location.search)) {
                         /* con sesion activa no debe quedarse en login/register: al panel */
                         location.replace("/index.html");
                     }
                 } catch (e) {}
+
+                /* Firebase ya confirmo: liberar el contenido de paginas protegidas */
+                document.documentElement.classList.remove("sesion-pendiente");
+                ocultarSplash();
             });
             ready = true;
             renderAccount();
