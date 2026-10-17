@@ -124,6 +124,12 @@ const AUTH = (() => {
         const fb = window.__FB_AUTH_MODULE__;
         const make = providerFactories[providerId];
         if (!make) throw new Error("Proveedor no soportado.");
+        /* En moviles (ancho < 768px) signInWithPopup casi siempre falla o se
+           queda colgado: usar directamente signInWithRedirect. */
+        if (window.innerWidth < 768) {
+            await fb.signInWithRedirect(auth, make());
+            return;
+        }
         try {
             const res = await fb.signInWithPopup(auth, make());
             if (res && res.user) await crearPerfil(res.user.uid, res.user.displayName || res.user.email);

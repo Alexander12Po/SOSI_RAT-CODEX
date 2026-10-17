@@ -15,7 +15,9 @@
 
     /* OAuth — flujo real vía Firebase (redirige al proveedor) */
     document.querySelectorAll(".oauth-btn").forEach(b => {
-        b.addEventListener("click", () => AUTH.oauth(b.dataset.provider));
+        b.addEventListener("click", () => {
+            AUTH.oauth(b.dataset.provider).catch(err => AUTH.toast(AUTH.traducirError(err), "error"));
+        });
         b.disabled = false;
     });
 
