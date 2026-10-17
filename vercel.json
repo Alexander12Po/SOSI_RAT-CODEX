@@ -42,5 +42,20 @@
       "source": "/configuracion",
       "destination": "/configuracion.html"
     }
+  ],
+  "headers": [
+    {
+      "source": "/assets/js/(config|env)\\.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    }
   ]
 }

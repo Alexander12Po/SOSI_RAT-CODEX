@@ -17,7 +17,8 @@ const AUTH = (() => {
 
     let client = null;          // instancia Supabase
     let ready = false;          // cliente inicializado correctamente
-    let cfg = null;             // CONFIG.SUPABASE
+    let cfg = null;             // configuración (window.SOSI_SUPABASE)
+    let pendingOAuth = null;    // proveedor OAuth pendiente desde ?oauth=
     const listeners = [];       // suscriptores de cambios de sesión
     let currentUser = null;
 
@@ -25,7 +26,19 @@ const AUTH = (() => {
 
     /* ---------- inicialización ---------- */
     async function init() {
-        cfg = (typeof CONFIG !== "undefined" && CONFIG.SUPABASE) ? CONFIG.SUPABASE : null;
+        /* Fuente de verdad única: window.SOSI_SUPABASE (env.js), que lee
+           las variables de Vercel (SUPABASE_URL / SUPABASE_ANON_KEY).
+           Fallback a CONFIG.SUPABASE solo por compatibilidad. */
+        cfg = (typeof window !== "undefined" && window.SOSI_SUPABASE) ||
+              ((typeof CONFIG !== "undefined" && CONFIG.SUPABASE) ? CONFIG.SUPABASE : null);
+
+        /* Detectar proveedor desde el formulario (?oauth=github|google|discord) */
+        try {
+            const q = new URLSearchParams(location.search);
+            const prov = (q.get("oauth") || "").toLowerCase();
+            if (["google", "github", "discord"].includes(prov)) pendingOAuth = prov;
+        } catch (e) {}
+
         if (!cfg || !cfg.enabled || !cfg.url || !cfg.anonKey || !window.supabase) {
             /* Sin credenciales todavía: igualmente mostramos el widget (botón "Iniciar sesión") */
             renderAccount();
@@ -46,6 +59,14 @@ const AUTH = (() => {
             });
             ready = true;
             renderAccount();
+            /* Retorno OAuth: si la URL trae ?code=.../#access_token, Supabase
+               lo consume solo (detectSessionInUrl) y onAuthStateChange dispara.
+               Si además venimos con ?oauth=github y seguimos sin sesión,
+               reintentamos el flujo una sola vez (cubre cancelaciones). */
+            if (pendingOAuth && !currentUser) {
+                const p = pendingOAuth; pendingOAuth = null;
+                setTimeout(() => oauth(p), 400);
+            }
             return true;
         } catch (e) {
             console.warn("[auth] no disponible:", e && e.message);
@@ -75,14 +96,36 @@ const AUTH = (() => {
     }
 
     /* ---------- OAuth ---------- */
+    function urlRetorno() {
+        /* URL de retorno autorizada en Supabase (dominio de producción). */
+        return (window.SOSI_SUPABASE && window.SOSI_SUPABASE.redirectTo) ||
+               (location.origin + "/login.html");
+    }
     async function oauth(providerId) {
-        if (!ready) { toast("Autenticación no configurada todavía.", "error"); return; }
+        if (!cfg || !cfg.url || !cfg.anonKey) {
+            toast("Faltan las credenciales de Supabase. Configura SUPABASE_URL y SUPABASE_ANON_KEY en Vercel.", "error");
+            return;
+        }
+        if (!ready) {
+            toast("El servicio de autenticación no está disponible. Revisa la URL del proyecto de Supabase.", "error");
+            return;
+        }
         try {
-            const { error } = await client.auth.signInWithOAuth({
+            const { data, error } = await client.auth.signInWithOAuth({
                 provider: providerId,
-                options: { redirectTo: location.origin + location.pathname }
+                options: { redirectTo: urlRetorno(), skipBrowserRedirect: false }
             });
-            if (error) toast(error.message || "No se pudo iniciar sesión.", "error");
+            if (error) {
+                const m = (error.message || "").toLowerCase();
+                if (m.includes("not found") || m.includes("invalid provider")) {
+                    toast(`"${providerId}" no está habilitado en Supabase → Authentication → Third-party providers.`, "error");
+                } else {
+                    toast(traducirError(error), "error");
+                }
+                return;
+            }
+            /* Si por cualquier motivo el SDK no redirigiera solo, usamos data.url */
+            if (data && data.url) { location.assign(data.url); }
         } catch (e) {
             toast("Error al iniciar sesión con el proveedor.", "error");
         }
@@ -132,7 +175,26 @@ const AUTH = (() => {
         return e.message || "Ocurrió un error inesperado.";
     }
     function requireReady() {
-        if (!ready) throw new Error("La autenticación no está configurada. Añade las credenciales de Supabase en config.js.");
+        if (!ready) throw new Error("La autenticación no está configurada. Añade SUPABASE_URL y SUPABASE_ANON_KEY en Vercel (Project Settings → Environment Variables).");
+    }
+
+    /* ---------- OAuth: retorno del proveedor (?code=... o #access_token=...) ---------- */
+    async function consumeUrlSession() {
+        if (!ready || !client) return false;
+        const qs = new URLSearchParams(location.search);
+        if (!qs.has("code") && !(location.hash || "").includes("access_token")) return false;
+        try {
+            const { data, error } = await client.session.fromUrl(window.location.href);
+            if (error || !data || !data.session) throw error || new Error("sin sesión");
+            currentUser = data.session.user;
+            renderAccount(); notify();
+            history.replaceState({}, "", location.pathname); /* limpia la URL */
+            return true;
+        } catch (e) {
+            toast("No se pudo completar el inicio de sesión con el proveedor.", "error");
+            history.replaceState({}, "", location.pathname);
+            return false;
+        }
     }
 
     /* ---------- estado ---------- */
@@ -241,7 +303,7 @@ const AUTH = (() => {
 
     return {
         init, oauth, signUp, signIn, resetPassword, updatePassword, signOut,
-        user, isConfigured, onChange, providers: PROVIDERS,
+        user, isConfigured, onChange, providers: PROVIDERS, consumeUrlSession,
         nombre, avatarHtml, esc, toast
     };
 })();
