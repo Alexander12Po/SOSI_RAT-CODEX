@@ -263,3 +263,12 @@
 .auth-gate-btn{display:inline-flex;width:100%;justify-content:center;margin-bottom:12px}
 .auth-gate-skip{display:block;font-size:12px;color:#A7B2C7;text-decoration:none;transition:color .2s}
 .auth-gate-skip:hover{color:#3B82F6}
+
+/* --- setup avanzado de Supabase (localStorage) --- */
+.auth-setup{margin-top:10px}
+.auth-setup-det summary{cursor:pointer;font-size:11px;color:var(--txt-2,#A7B2C7);list-style:none}
+.auth-setup-det[open] summary{margin-bottom:8px}
+.auth-setup .auth-input{width:100%;margin-bottom:6px;font-size:12px}
+.auth-btn-ghost{background:transparent;border:1px solid #273449;color:#A7B2C7;width:100%}
+.auth-btn-ghost:hover{border-color:#3B82F6;color:#fff}
+.auth-setup-note{font-size:10px;color:#6b7a94;margin:6px 0 0}

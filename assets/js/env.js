@@ -15,12 +15,12 @@
     try { if (base === window.SOSI_SUPABASE) base = {}; } catch (e) {}
     base = Object.assign({}, base);
 
-    /* --- Inyección en el despliegue: Vercel sustituye ${env.XXX} por el valor
-       de la variable de entorno al publicar. Si los marcadores no fueron
-       sustituidos (entorno local), se ignoran automáticamente. --- */
+    /* --- Inyección del despliegue: intenta leer las variables que Vercel
+       sustituye en tiempo de build si usas Build Command o Edge Middleware.
+       En hosting 100% estático esto queda vacío y no interfiere. --- */
     try {
-        var tplUrl = "${env.SUPABASE_URL}";
-        var tplKey = "${env.SUPABASE_ANON_KEY}";
+        var tplUrl = "${" + "env.SUPABASE_URL}";
+        var tplKey = "${" + "env.SUPABASE_ANON_KEY}";
         if (/^https:\/\/.+/.test(tplUrl)) base.url = tplUrl;
         if (/^[A-Za-z0-9_\-\.]{20,}$/.test(tplKey)) base.anonKey = tplKey;
     } catch (e) {}
