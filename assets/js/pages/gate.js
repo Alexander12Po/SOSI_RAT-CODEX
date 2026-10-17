@@ -4,7 +4,7 @@
 (function () {
     var RUTA_LOGIN = "/login.html";
     var pagina = location.pathname.replace(/\/+$/, "");
-    var publicas = ["/login", "/register", "/forgot-password", "", "/index"];
+    var publicas = ["/login.html", "/register.html", "/forgot-password.html", "", "/", "/index.html", "/index"];
     if (publicas.indexOf(pagina) !== -1) return;
 
     function tieneSesion() {
