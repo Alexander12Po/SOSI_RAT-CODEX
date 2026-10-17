@@ -7,7 +7,7 @@
     const meter = document.getElementById("pwMeter");
     const hint = document.getElementById("pwHint");
 
-    AUTH.onChange(u => { if (u) location.replace("/"); });
+    AUTH.onChange(u => { if (u) location.replace("/index.html"); });
 
     document.querySelectorAll(".oauth-btn").forEach(b =>
         b.addEventListener("click", () => AUTH.oauth(b.dataset.provider)));

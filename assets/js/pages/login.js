@@ -9,7 +9,7 @@
     AUTH.onChange(u => {
         if (u && !redirigido && !/reset=1/.test(location.search)) {
             redirigido = true;
-            location.replace("/");
+            location.replace("/index.html");
         }
     });
 
