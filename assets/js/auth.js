@@ -19,6 +19,7 @@ const AUTH = (() => {
     let app = null, auth = null, db = null, providerFactories = {};
     let ready = false;
     let currentUser = null;      // { uid, email, displayName, photoURL, provider }
+    let authResuelto = false;    // true cuando Firebase ya dio su primera respuesta real
     const listeners = [];
 
     function notify() { listeners.forEach(fn => { try { fn(currentUser); } catch (_) {} }); }
@@ -62,6 +63,7 @@ const AUTH = (() => {
             }).catch(() => {});
 
             fbAuth.onAuthStateChanged(auth, (u) => {
+                authResuelto = true;
                 currentUser = mapUser(u);
                 renderAccount();
                 notify();
@@ -196,7 +198,7 @@ const AUTH = (() => {
 
     function user() { return currentUser; }
     function isConfigured() { return ready; }
-    function onChange(fn) { listeners.push(fn); fn(currentUser); }
+    function onChange(fn) { listeners.push(fn); if (authResuelto) fn(currentUser); }
 
     /* ---------- widget de cuenta ---------- */
 

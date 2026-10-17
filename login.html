@@ -82,17 +82,19 @@
 
 <script src="assets/js/firebase.js?v=21"></script>
 <script src="assets/js/config.js?v=21"></script>
-<script src="assets/js/auth.js?v=22"></script>
-<script src="assets/js/pages/login.js?v=22"></script>
+<script src="assets/js/auth.js?v=23"></script>
+<script src="assets/js/pages/login.js?v=23"></script>
 <script>
-/* "Volver": al panel si hay sesion, si no se queda en login (acceso obligatorio) */
+/* "Volver": al panel solo si hay sesion real de Firebase (usa el estado ya
+   confirmado por onAuthStateChanged en auth.js; sin falsos negativos). */
 (function(){
-  try{
-    var keys=Object.keys(localStorage).filter(k=>k.indexOf("sb-")===0&&k.indexOf("-auth-token")!==-1);
-    var ok=false;
-    for(const k of keys){ if(/"access_token"\s*:\s*"eyJ/.test(localStorage.getItem(k)||"")){ok=true;break;} }
-    if(!ok){ document.getElementById("backLink").style.display="none"; }
-  }catch(e){}
+  function aplicar(u){
+    var back = document.getElementById("backLink");
+    if (back) back.style.display = u ? "" : "none";
+  }
+  if (window.AUTH && typeof AUTH.onChange === "function") {
+    AUTH.onChange(aplicar);
+  }
 })();
 </script>
 </body>
