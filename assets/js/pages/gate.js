@@ -1,24 +1,34 @@
-/* Gate de acceso: muestra el login primero en la página principal */
+/* Gate de acceso OBLIGATORIO: sin sesion valida -> login.html directo.
+   El script inline de index.html ya redirige; aqui solo se asegura en
+   paginas internas (consulta/nombre/genealogica/servicio/perfil). */
 (function () {
-  var KEY = 'sosi_gate_ok';
-  function close() {
-    try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
-    var g = document.getElementById('authGate');
-    if (g) g.hidden = true;
-  }
-  document.addEventListener('DOMContentLoaded', function () {
-    var gate = document.getElementById('authGate');
-    if (!gate) return;
-    // Si ya pasó el gate en esta sesión, no molestar
-    try { if (sessionStorage.getItem(KEY) === '1') { gate.hidden = true; return; } } catch (e) {}
-    // Ocultar si ya hay sesión de usuario iniciada
-    setTimeout(function () {
-      try {
-        var u = (typeof AUTH !== 'undefined' && AUTH.user) ? AUTH.user() : null;
-        if (u) gate.hidden = true;
-      } catch (e) {}
-    }, 600);
-    var skip = document.getElementById('authGateSkip');
-    if (skip) skip.addEventListener('click', function (ev) { ev.preventDefault(); close(); });
-  });
+    var RUTA_LOGIN = "/login.html";
+    var pagina = location.pathname.replace(/\/+$/, "");
+    var publicas = ["/login", "/register", "/forgot-password", "", "/index"];
+    if (publicas.indexOf(pagina) !== -1) return;
+
+    function tieneSesion() {
+        try {
+            var keys = Object.keys(localStorage).filter(function (k) {
+                return k.indexOf("sb-") === 0 && k.indexOf("-auth-token") !== -1;
+            });
+            for (var i = 0; i < keys.length; i++) {
+                var v = localStorage.getItem(keys[i]) || "";
+                if (/"access_token"\s*:\s*"eyJ/.test(v)) return true;
+            }
+        } catch (e) {}
+        return false;
+    }
+
+    /* Si Supabase confirma sesion real, AUTH la gestiona; si al cargar
+       sigue sin sesion local, redirigir al login. */
+    document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(function () {
+            if (!tieneSesion()) {
+                var u = null;
+                try { u = (window.AUTH && AUTH.user) ? AUTH.user() : null; } catch (e) {}
+                if (!u) location.replace(RUTA_LOGIN + "?next=" + encodeURIComponent(location.pathname));
+            }
+        }, 900);
+    });
 })();

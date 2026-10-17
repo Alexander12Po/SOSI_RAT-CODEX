@@ -74,7 +74,7 @@
         <p class="auth-foot">¿No tienes una cuenta? <a class="auth-link" href="register.html">Regístrate</a></p>
     </form>
 
-    <a class="auth-back" href="/" style="justify-content:center; margin-top:14px;">
+    <a class="auth-back" id="backLink" href="/consulta.html" style="justify-content:center; margin-top:14px;">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
         Volver al panel
     </a>
@@ -86,5 +86,16 @@
 <script src="assets/js/auth.js?v=17"></script>
 <script src="assets/js/pages/login.js?v=17"></script>
 <script src="assets/js/pages/setup-auth.js?v=17"></script>
+<script>
+/* "Volver": al panel si hay sesion, si no se queda en login (acceso obligatorio) */
+(function(){
+  try{
+    var keys=Object.keys(localStorage).filter(k=>k.indexOf("sb-")===0&&k.indexOf("-auth-token")!==-1);
+    var ok=false;
+    for(const k of keys){ if(/"access_token"\s*:\s*"eyJ/.test(localStorage.getItem(k)||"")){ok=true;break;} }
+    if(!ok){ document.getElementById("backLink").style.display="none"; }
+  }catch(e){}
+})();
+</script>
 </body>
 </html>

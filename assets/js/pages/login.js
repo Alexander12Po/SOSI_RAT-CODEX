@@ -77,7 +77,7 @@
             /* persistencia: supabase-js guarda la sesión automáticamente.
                "Recordarme" se gestiona con el almacenamiento del SDK. */
             AUTH.toast("Sesión iniciada. Bienvenido.", "ok");
-            setTimeout(() => location.replace("/"), 500);
+            const nx = new URLSearchParams(location.search).get("next"); setTimeout(() => location.replace(nx && nx.startsWith("/") ? nx : "/"), 500);
         } catch (err) {
             showErr(err.message || "No se pudo iniciar sesión.");
             btn.disabled = false; btn.classList.remove("loading");
