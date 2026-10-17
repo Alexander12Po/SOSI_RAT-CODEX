@@ -68,7 +68,7 @@ const AUTH = (() => {
                 /* Gate: paginas protegidas sin sesion -> login */
                 try {
                     const p = location.pathname.replace(/\/+$/, "");
-                    const publicas = ["/login", "/register", "/forgot-password", "", "/index"];
+                    const publicas = ["/login.html", "/register.html", "/forgot-password.html", "", "/", "/index.html", "/index"];
                     if (!currentUser && publicas.indexOf(p) === -1) {
                         location.replace("/login.html?next=" + encodeURIComponent(location.pathname));
                     }
