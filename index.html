@@ -47,34 +47,12 @@
 
 
     <!-- GATE DE ACCESO: el login es la PRIMERA pantalla (obligatorio).
-         Sin sesion -> redirige directo a login.html, sin tarjeta intermedia.
-         Con sesion -> se muestra el panel directamente. -->
+         auth.js (cargado arriba) revisa la sesion real con Firebase y redirige
+         a login.html si no existe, una vez que Firebase confirma el estado
+         (evita el bucle index->login->index). -->
     <script src="assets/js/firebase.js?v=21"></script>
     <script src="assets/js/config.js?v=21"></script>
     <script src="assets/js/auth.js?v=30"></script>
-
-    <!-- GATE DE ACCESO: el login es la PRIMERA pantalla (obligatorio).
-         Solo redirige a login.html cuando NO existe ninguna pista de sesion
-         del SDK de Firebase. Si hay pista, auth.js muestra un splash breve y
-         deja el panel en manos de onAuthStateChanged (unica fuente de verdad),
-         evitando asi el rebote index->login->index que causaba el bucle. -->
-    <script>
-    (function () {
-        try {
-            var conSesion = false;
-            ["localStorage", "sessionStorage"].forEach(function (storeName) {
-                var store = window[storeName];
-                if (!store) return;
-                Object.keys(store).forEach(function (k) {
-                    if (k.indexOf("firebase:") !== 0 || k.indexOf(":credential") === -1) return;
-                    var v = store.getItem(k) || "";
-                    if (/"accessToken"\s*:\s*"[A-Za-z0-9_\-]{20,}/.test(v)) conSesion = true;
-                });
-            });
-            if (!conSesion) location.replace("login.html");
-        } catch (e) { /* si no se puede leer el almacenamiento, dejar que auth.js decida */ }
-    })();
-    </script>
 
     <!-- SIDEBAR (se genera desde services.js) -->
     <aside class="sidebar" id="sidebar">
@@ -179,12 +157,9 @@
         </footer>
     </main>
 
-    <script src="assets/js/config.js?v=21"></script>
     <script src="assets/js/icons.js?v=21"></script>
     <script src="assets/js/services.js?v=21"></script>
     <script src="assets/js/loader.js?v=21"></script>
-    <script src="assets/js/firebase.js?v=21"></script>
-    <script src="assets/js/auth.js?v=30"></script>
     <script src="assets/js/sidebar.js?v=21"></script>
     <script src="assets/js/pages/home.js?v=21"></script>
 </body>
