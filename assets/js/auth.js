@@ -127,7 +127,15 @@ const AUTH = (() => {
 
             await fbAuth.getRedirectResult(auth).then((res) => {
                 if (res && res.user) { /* sesion ya quedara via onAuthStateChanged */ }
-            }).catch(() => {});
+            }).catch((err) => {
+                console.error("SOSI: error en getRedirectResult", err);
+                const code = (err && err.code) || "";
+                if (code.indexOf("web-storage-unsupported") !== -1 || code.indexOf("network-request-failed") !== -1) {
+                    toast("Tu navegador está bloqueando el inicio de sesión con Google/GitHub (revisa la configuración de privacidad/cookies de terceros). Prueba con Chrome o baja el nivel de bloqueo para este sitio.", "error");
+                } else if (code) {
+                    toast(traducirError(err), "error");
+                }
+            });
 
             fbAuth.onAuthStateChanged(auth, (u) => {
                 authResuelto = true;
