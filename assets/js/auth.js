@@ -93,23 +93,21 @@ const AUTH = (() => {
         try {
             const p = location.pathname.replace(/\/+$/, "") || "/";
             const publicas = ["/login.html", "/register.html", "/forgot-password.html"];
-            const esPanel = (p === "/" || p === "/index.html");
-            if (publicas.indexOf(p) === -1 && !esPanel) {
+            /* Pagina protegida (incluye el panel "/"): mostrar splash y ESPERAR
+               la confirmacion real de Firebase (onAuthStateChanged, mas abajo).
+               Ya no se usa hayPistaSesionLocal() para decidir: Firebase v10
+               guarda la sesion en IndexedDB, no en localStorage/sessionStorage,
+               asi que esa pista siempre daba falso con sesion real y causaba
+               el bucle index<->login. */
+            if (publicas.indexOf(p) === -1) {
                 mostrarSplash();
                 document.documentElement.classList.add("sesion-pendiente");
                 setTimeout(() => {
-                    /* si Firebase tarda demasiado, no dejar al usuario atrapado */
-                    if (!authResuelto && hayPistaSesionLocal()) {
+                    if (!authResuelto) {
                         document.documentElement.classList.remove("sesion-pendiente");
                         ocultarSplash();
                     }
                 }, 6000);
-            } else if (esPanel) {
-                /* "/": el login es la PRIMERA pantalla obligatoria. Solo se
-                   redirige de inmediato cuando NO hay ninguna pista de sesion;
-                   con pista, se muestra el panel y onAuthStateChanged confirma
-                   en segundo plano (unica fuente de verdad — nunca un rebote). */
-                if (!hayPistaSesionLocal()) location.replace("/login.html");
             }
         } catch (_) {}
         try {
